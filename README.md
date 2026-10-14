@@ -34,3 +34,73 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+src/
+├── app/
+│   ├── page.tsx                          # Landing Page (Daftar event mendatang + Debounce search)
+│   ├── layout.tsx
+│   ├── globals.css
+│   │
+│   ├── events/
+│   │   ├── page.tsx                      # Penjelajahan Event (Filter kategori/lokasi)
+│   │   └── [eventId]/
+│   │       └── page.tsx                  # Detail Event + Tombol Beli Tiket
+│   │
+│   ├── checkout/
+│   │   └── [eventId]/
+│   │       └── page.tsx                  # Halaman Form Checkout (Gunakan poin/voucher)
+│   │
+│   ├── transactions/
+│   │   ├── page.tsx                      # Riwayat Transaksi Customer (Status transaksi)
+│   │   └── [transactionId]/
+│   │       └── page.tsx                  # Detail Transaksi + Countdown 10 Menit & Upload Bukti
+│   │
+│   ├── organizer/                        # Area khusus Event Organizer (Protected Route)
+│   │   ├── dashboard/
+│   │   │   └── page.tsx                  # Dashboard EO (Kelola transaksi masuk: Terima/Tolak bukti)
+│   │   ├── events/
+│   │   │   ├── page.tsx                  # Daftar event yang dibuat oleh EO tersebut
+│   │   │   ├── create/
+│   │   │   │   └── page.tsx              # Form Pembuatan Event (Nama, harga, kuota, tgl mulai/selesai)
+│   │   │   └── [eventId]/
+│   │   │       └── edit/
+│   │   │           └── page.tsx          # Form Edit Event
+│   │   ├── vouchers/
+│   │   │   └── page.tsx                  # Pembuatan & Manajemen Voucher Promosi Event (Periode terbatas)
+│   │   └── profile/
+│   │       └── page.tsx                  # Profil EO (Menampilkan akumulasi rating & ulasan)
+│   │
+│   ├── profile/
+│   │   └── page.tsx                      # Profil Customer
+│   ├── login/
+│   │   └── page.tsx
+│   └── register/
+│       └── page.tsx
+│
+├── features/                             # Logika bisnis, hooks, state, komponen spesifik fitur
+│   ├── landing/                          # Logika landing page
+│   ├── events/                           # Filter event, detail event, form create/edit event
+│   ├── transactions/                     # [TAMBAHAN] Logic checkout, hitung mundur 10 menit, upload bukti
+│   ├── reviews/                          # [TAMBAHAN] Logic input ulasan & rating dari customer
+│   ├── dashboard/                        # [TAMBAHAN] Logic EO approve/reject transaksi pembeli
+│   ├── vouchers/                         # Logic pembuatan voucher terbatas oleh EO
+│   ├── profile/
+│   └── auth/
+│
+├── components/                           # Komponen global (Re-usable)
+│   ├── layout/                           # Navbar, Footer, Sidebar Organizer
+│   └── ui/                               # Button, Input, Modal, Badge Status, Countdown Timer
+│
+├── hooks/                                # [RECOMMENDED] Custom hooks global
+│   ├── useDebounce.ts                    # Hook khusus untuk fungsionalitas debounce search bar
+│   └── useCountdown.ts                   # Hook khusus untuk hitung mundur 10 menit transaksi
+│
+├── lib/
+│   ├── axios.ts
+│   └── utils.ts                          # Helper rupiah formatter (IDR) & format tanggal
+│
+└── types/
+    ├── event.types.ts                    # Type khusus data event & voucher
+    ├── transaction.types.ts              # Type khusus transaksi & status enum
+    └── common.types.ts
