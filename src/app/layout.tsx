@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <QueryProvider>{children}</QueryProvider>
+    <html lang="id" data-theme="sportticketing" className="h-full antialiased">
+      <body className="flex min-h-full flex-col bg-white font-sans text-secondary">
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

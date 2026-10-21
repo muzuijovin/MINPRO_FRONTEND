@@ -1,1 +1,0 @@
-// pakai ternary aja dibuat di components
