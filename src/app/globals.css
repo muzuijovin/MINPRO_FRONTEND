@@ -1,2 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "sportticketing";
+  default: true;
+  color-scheme: light;
+
+  --color-primary: #ff6b1a;
+  --color-primary-content: #ffffff;
+  --color-secondary: #1f2937;
+  --color-neutral: #f8f8f8;
+  --color-neutral-content: #1f2937;
+}
+
+@theme {
+  --color-tertiary: #10b981;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+}
