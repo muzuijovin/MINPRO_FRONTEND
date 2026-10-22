@@ -1,12 +1,14 @@
 import NavbarSection from "@/components/layout/navbar";
 
-export default function UserLayout({ children }: LayoutProps<"/">) {
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
-      <div>
-        <NavbarSection />
-        <div>{children}</div>
-      </div>
+      <NavbarSection />
+      <div>{children}</div>
     </>
   );
 }
