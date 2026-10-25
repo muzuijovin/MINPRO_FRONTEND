@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiChevronDown, FiMenu, FiUser } from "react-icons/fi";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
+import { TYPE_PRICE_OPTIONS } from "@/features/organizer/events/constants/createEventData";
 import { CategoryTree } from "@/types/category.type";
 
 const BRAND_NAME = "SportTicketing";
@@ -13,11 +14,11 @@ type NavLink = { label: string; href: string };
 
 const categoryHref = (slug: string) => `/events?category=${slug}`;
 
-const TICKET_TYPE_LINKS: NavLink[] = [
-  { label: "Tiket Individu", href: "/events?ticket=individual" },
-  { label: "Tiket Tim", href: "/events?ticket=team" },
-  { label: "Early Bird", href: "/events?ticket=early-bird" },
-];
+// typePrice cuma enum FREE / PAID, jadi tidak perlu fetch -> langsung pakai query ?typePrice= di GET /events
+const TYPE_PRICE_LINKS: NavLink[] = TYPE_PRICE_OPTIONS.map((option) => ({
+  label: option.label,
+  href: `/events?typePrice=${option.value}`,
+}));
 
 function Dropdown({ label, items }: { label: string; items: NavLink[] }) {
   return (
@@ -134,9 +135,9 @@ export function NavbarLanding() {
                 <ul>{categoryMenu}</ul>
               </li>
               <li>
-                <span className="menu-title">Tipe Tiket</span>
+                <span className="menu-title">Tipe Harga</span>
                 <ul>
-                  {TICKET_TYPE_LINKS.map((l) => (
+                  {TYPE_PRICE_LINKS.map((l) => (
                     <li key={l.href}>
                       <Link href={l.href}>{l.label}</Link>
                     </li>
@@ -187,7 +188,7 @@ export function NavbarLanding() {
               </details>
             </li>
             <li>
-              <Dropdown label="Tipe Tiket" items={TICKET_TYPE_LINKS} />
+              <Dropdown label="Tipe Harga" items={TYPE_PRICE_LINKS} />
             </li>
           </ul>
         </div>
