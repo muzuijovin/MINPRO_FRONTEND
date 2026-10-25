@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,12 +22,9 @@ import {
 } from "react-icons/fi";
 import { MdQrCode2 } from "react-icons/md";
 
-import {
-  CITY_OPTIONS,
-  HERO_SLIDES,
-  POPULAR_PILLS,
-} from "../constants/heroData";
+import { CITY_OPTIONS, POPULAR_PILLS } from "../constants/heroData";
 import { useDebounce } from "../hooks/useDebounce";
+import { useUpcomingEvents } from "../hooks/useUpcomingEvents";
 import { SearchSchema, searchSchema } from "../validation/searchSchema";
 
 const TRUST_ITEMS = [
@@ -64,6 +62,10 @@ export function HeroSection() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // 3 event terdekat dari GET /events
+  const { data: events = [], isLoading: isEventsLoading } =
+    useUpcomingEvents(3);
+
   const { register, handleSubmit, watch, setValue } = useForm<SearchSchema>({
     resolver: zodResolver(searchSchema),
     defaultValues: { keyword: "", city: "" },
@@ -91,7 +93,7 @@ export function HeroSection() {
   const scrollToSlide = (index: number) => {
     const el = carouselRef.current;
     if (!el) return;
-    const target = (index + HERO_SLIDES.length) % HERO_SLIDES.length;
+    const target = (index + events.length) % events.length;
     el.scrollTo({ left: target * el.clientWidth, behavior: "smooth" });
   };
 
@@ -110,176 +112,223 @@ export function HeroSection() {
           onScroll={handleScroll}
           className="carousel w-full rounded-b-xl"
         >
-          {HERO_SLIDES.map((slide, index) => (
-            <article
-              key={slide.id}
-              className="carousel-item relative h-130 w-full md:h-140"
-            >
-              <Image
-                src={slide.image}
-                alt={slide.imageAlt}
-                fill
-                sizes="100vw"
-                priority={index === 0}
-                className="object-cover"
-              />
-              
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/10" />
-              <div className="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-transparent" />
-
+          {isEventsLoading ? (
+            <div className="carousel-item h-130 w-full animate-pulse bg-gray-300 md:h-140" />
+          ) : events.length === 0 ? (
+            // belum ada event terdekat / request gagal -> banner default
+            <article className="carousel-item relative h-130 w-full bg-secondary md:h-140">
               <div className="relative z-10 flex h-full flex-col justify-end gap-4 px-6 pb-24 md:px-14 md:pb-28">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="badge border-none bg-primary text-xs font-bold text-white p-1">
-                    {slide.badge}
-                  </span>
-                  <span className="badge border-none bg-white/20 text-xs font-semibold text-white backdrop-blur p-1">
-                    {slide.category}
-                  </span>
-                  <span className="badge border-none bg-red-600 text-xs font-bold text-white p-1">
-                    Sisa {slide.slotLeft} Slot
-                  </span>
-                </div>
-
                 <h1 className="max-w-2xl text-3xl font-extrabold text-white md:text-5xl">
-                  {slide.title}
+                  Belum ada event terdekat
                 </h1>
                 <p className="max-w-xl text-sm text-white/80 md:text-base">
-                  {slide.description}
+                  Pantau terus, event olahraga baru akan segera hadir.
                 </p>
-
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-white/90 md:text-sm">
-                  <span className="flex items-center gap-1.5">
-                    <FiCalendar className="text-primary" />
-                    {format(new Date(slide.date), "d MMMM yyyy • HH:mm", {
-                      locale: idLocale,
-                    })}{" "}
-                    WIB
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FiMapPin className="text-primary" />
-                    {slide.location}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FiTag className="text-primary" />
-                    Mulai{" "}
-                    <strong className="text-base">
-                      {formatRupiah(slide.startPrice)}
-                    </strong>
-                  </span>
-                </div>
-
-                <div className="mt-2 flex flex-wrap gap-3">
-                  <button type="button" className="btn rounded-full border-none bg-primary px-6 text-white shadow-none hover:brightness-110">
-                    Daftar / Beli Tiket Sekarang
+                <div className="mt-2">
+                  <Link
+                    href="/events"
+                    className="btn rounded-full border-none bg-primary px-6 text-white shadow-none hover:brightness-110"
+                  >
+                    Jelajahi Event
                     <FiArrowRight />
-                  </button>
-                  <button type="button" className="btn rounded-full border border-white/30 bg-white/15 px-6 text-white shadow-none backdrop-blur hover:bg-white/25">
-                    Lihat Detail Event
-                  </button>
+                  </Link>
                 </div>
               </div>
             </article>
-          ))}
+          ) : (
+            events.map((event, index) => (
+              <article
+                key={event.id}
+                className="carousel-item relative h-130 w-full md:h-140"
+              >
+                <Image
+                  src={event.coverImageUrl}
+                  alt={event.title}
+                  fill
+                  sizes="100vw"
+                  priority={index === 0}
+                  className="object-cover"
+                />
+
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/10" />
+                <div className="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-transparent" />
+
+                <div className="relative z-10 flex h-full flex-col justify-end gap-4 px-6 pb-24 md:px-14 md:pb-28">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="badge border-none bg-primary text-xs font-bold text-white p-1">
+                      {event.typePrice === "FREE" ? "GRATIS" : "EVENT TERDEKAT"}
+                    </span>
+                    <span className="badge border-none bg-white/20 text-xs font-semibold text-white backdrop-blur p-1">
+                      {event.categories?.name}
+                    </span>
+                    <span className="badge border-none bg-red-600 text-xs font-bold text-white p-1">
+                      Kuota {event.quota} Slot
+                    </span>
+                  </div>
+
+                  <h1 className="max-w-2xl text-3xl font-extrabold text-white md:text-5xl">
+                    {event.title}
+                  </h1>
+                  <p className="line-clamp-2 max-w-xl text-sm text-white/80 md:text-base">
+                    {event.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-white/90 md:text-sm">
+                    {event.startsAt && (
+                      <span className="flex items-center gap-1.5">
+                        <FiCalendar className="text-primary" />
+                        {format(
+                          new Date(event.startsAt),
+                          "d MMMM yyyy • HH:mm",
+                          {
+                            locale: idLocale,
+                          },
+                        )}{" "}
+                        WIB
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1.5">
+                      <FiMapPin className="text-primary" />
+                      {event.location}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <FiTag className="text-primary" />
+                      {event.typePrice === "FREE" ? (
+                        <strong className="text-base">Gratis</strong>
+                      ) : (
+                        <>
+                          Mulai{" "}
+                          <strong className="text-base">
+                            {formatRupiah(Number(event.price))}
+                          </strong>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-3">
+                    <Link
+                      href={`/events/${event.slug}`}
+                      className="btn rounded-full border-none bg-primary px-6 text-white shadow-none hover:brightness-110"
+                    >
+                      Daftar / Beli Tiket Sekarang
+                      <FiArrowRight />
+                    </Link>
+                    <Link
+                      href={`/events/${event.slug}`}
+                      className="btn rounded-full border border-white/30 bg-white/15 px-6 text-white shadow-none backdrop-blur hover:bg-white/25"
+                    >
+                      Lihat Detail Event
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
         </div>
 
-        {/* Tombol prev / next */}
-        <button
-          type="button"
-          aria-label="Slide sebelumnya"
-          onClick={() => scrollToSlide(activeIndex - 1)}
-          className="btn btn-circle btn-sm absolute left-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
-        >
-          <FiChevronLeft size={18} />
-        </button>
-        <button
-          type="button"
-          aria-label="Slide berikutnya"
-          onClick={() => scrollToSlide(activeIndex + 1)}
-          className="btn btn-circle btn-sm absolute right-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
-        >
-          <FiChevronRight size={18} />
-        </button>
+        {/* Tombol prev / next & indicator cuma muncul kalau slide nya lebih dari 1 */}
+        {events.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Slide sebelumnya"
+              onClick={() => scrollToSlide(activeIndex - 1)}
+              className="btn btn-circle btn-sm absolute left-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+            >
+              <FiChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label="Slide berikutnya"
+              onClick={() => scrollToSlide(activeIndex + 1)}
+              className="btn btn-circle btn-sm absolute right-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+            >
+              <FiChevronRight size={18} />
+            </button>
 
-        {/* Indicator */}
-        <div className="absolute bottom-8 right-6 z-10 hidden items-center gap-3 rounded-full border border-white/20 bg-black/50 px-3 py-1.5 text-xs font-semibold text-white lg:flex">
-          <span>
-            {String(activeIndex + 1).padStart(2, "0")} /{" "}
-            {String(HERO_SLIDES.length).padStart(2, "0")}
-          </span>
-          <div className="flex items-center gap-1.5">
-            {HERO_SLIDES.map((slide, i) => (
-              <button
-                type="button"
-                key={slide.id}
-                aria-label={`Ke slide ${i + 1}`}
-                onClick={() => scrollToSlide(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+            {/* Indicator */}
+            <div className="absolute bottom-8 right-6 z-10 hidden items-center gap-3 rounded-full border border-white/20 bg-black/50 px-3 py-1.5 text-xs font-semibold text-white lg:flex">
+              <span>
+                {String(activeIndex + 1).padStart(2, "0")} /{" "}
+                {String(events.length).padStart(2, "0")}
+              </span>
+              <div className="flex items-center gap-1.5">
+                {events.map((event, i) => (
+                  <button
+                    type="button"
+                    key={event.id}
+                    aria-label={`Ke slide ${i + 1}`}
+                    onClick={() => scrollToSlide(i)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ===== Search Card ===== */}
       <div className="absolute -bottom-24 left-1/2 z-20 flex w-[92%] max-w-3xl -translate-x-1/2 flex-col items-center gap-4">
         <div className="w-full rounded-2xl bg-white p-3 shadow-xl">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-2 md:flex-row"
-        >
-          <label className="flex h-11 flex-1 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40">
-            <FiSearch className="shrink-0 text-gray-400" />
-            <input
-              type="search"
-              placeholder="Cari race maraton, liga mini soccer, turnamen esports..."
-              className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-gray-400"
-              {...register("keyword")}
-            />
-          </label>
-
-          <label className="relative flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40 md:w-44">
-            <FiMapPin className="shrink-0 text-gray-400" />
-            <select
-              className="w-full appearance-none bg-transparent pr-5 text-sm text-secondary outline-none"
-              {...register("city")}
-            >
-              {CITY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <FiChevronDown className="pointer-events-none absolute right-3 text-gray-400" />
-          </label>
-
-          <button
-            type="submit"
-            className="btn h-11 min-h-0 rounded-xl border-none bg-primary px-6 text-sm text-white shadow-none hover:brightness-110"
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-2 md:flex-row"
           >
-            Cari Tiket Olahraga
-            <FiArrowRight />
-          </button>
-        </form>
+            <label className="flex h-11 flex-1 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40">
+              <FiSearch className="shrink-0 text-gray-400" />
+              <input
+                type="search"
+                placeholder="Cari race maraton, liga mini soccer, turnamen esports..."
+                className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-gray-400"
+                {...register("keyword")}
+              />
+            </label>
 
-        {/* Pill populer */}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-semibold text-gray-500">
-            Pill Populer:
-          </span>
-          {POPULAR_PILLS.map((pill) => (
+            <label className="relative flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40 md:w-44">
+              <FiMapPin className="shrink-0 text-gray-400" />
+              <select
+                className="w-full appearance-none bg-transparent pr-5 text-sm text-secondary outline-none"
+                {...register("city")}
+              >
+                {CITY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown className="pointer-events-none absolute right-3 text-gray-400" />
+            </label>
+
             <button
-              key={pill.id}
-              type="button"
-              onClick={() => setValue("keyword", pill.label)}
-              className="flex cursor-pointer items-center gap-1 rounded-full border border-gray-200 bg-neutral px-3 py-1 text-[11px] font-medium text-secondary transition-colors hover:border-primary hover:text-primary"
+              type="submit"
+              className="btn h-11 min-h-0 rounded-xl border-none bg-primary px-6 text-sm text-white shadow-none hover:brightness-110"
             >
-              <span>{pill.emoji}</span>
-              {pill.label}
+              Cari Tiket Olahraga
+              <FiArrowRight />
             </button>
-          ))}
-        </div>
+          </form>
+
+          {/* Pill populer */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-semibold text-gray-500">
+              Pill Populer:
+            </span>
+            {POPULAR_PILLS.map((pill) => (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => setValue("keyword", pill.label)}
+                className="flex cursor-pointer items-center gap-1 rounded-full border border-gray-200 bg-neutral px-3 py-1 text-[11px] font-medium text-secondary transition-colors hover:border-primary hover:text-primary"
+              >
+                <span>{pill.emoji}</span>
+                {pill.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Trust badges (di bawah kartu, sesuai desain) */}
