@@ -26,3 +26,14 @@ export type EventItem = {
     slug: string;
   };
 };
+
+// meta pagination dari GET /events (beda dengan PaginationMeta umum: pakai totalEvents)
+export type EventListMeta = {
+  page: number;
+  totalPage: number;
+  limit: number;
+  totalEvents: number;
+};
+
+export type EventSortBy = "startsAt" | "createdAt" | "price";
+export type SortOrder = "asc" | "desc";
