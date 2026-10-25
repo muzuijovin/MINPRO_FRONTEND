@@ -108,7 +108,7 @@ export function HeroSection() {
         <div
           ref={carouselRef}
           onScroll={handleScroll}
-          className="carousel w-full"
+          className="carousel w-full rounded-b-xl"
         >
           {HERO_SLIDES.map((slide, index) => (
             <article

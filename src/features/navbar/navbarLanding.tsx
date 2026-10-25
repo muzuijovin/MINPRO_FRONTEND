@@ -4,16 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiChevronDown, FiMenu, FiUser } from "react-icons/fi";
+import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
+import { CategoryTree } from "@/types/category.type";
 
 const BRAND_NAME = "SportTicketing";
 
 type NavLink = { label: string; href: string };
 
-const CATEGORY_LINKS: NavLink[] = [
-  { label: "Running", href: "/events?category=running" },
-  { label: "Mini Soccer & Futsal", href: "/events?category=soccer" },
-  { label: "Esports", href: "/events?category=esports" },
-];
+const categoryHref = (slug: string) => `/events?category=${slug}`;
 
 const TICKET_TYPE_LINKS: NavLink[] = [
   { label: "Tiket Individu", href: "/events?ticket=individual" },
@@ -41,8 +39,71 @@ function Dropdown({ label, items }: { label: string; items: NavLink[] }) {
   );
 }
 
+// isi menu kategori: parent -> children (sub category), dipakai di dropdown desktop & menu mobile
+function CategoryMenuItems({
+  categories,
+  isLoading,
+  isError,
+}: {
+  categories: CategoryTree[];
+  isLoading: boolean;
+  isError: boolean;
+}) {
+  if (isLoading)
+    return (
+      <li className="px-3 py-2">
+        <span className="loading loading-spinner loading-xs" />
+      </li>
+    );
+
+  if (isError)
+    return (
+      <li className="px-3 py-2 text-xs text-red-500">Gagal memuat kategori</li>
+    );
+
+  if (!categories.length)
+    return (
+      <li className="px-3 py-2 text-xs text-gray-400">Belum ada kategori</li>
+    );
+
+  return categories.map((parent) => (
+    <li key={parent.id}>
+      <Link href={categoryHref(parent.slug)} className="text-sm text-secondary hover:bg-slate-200">
+        {parent.name}
+      </Link>
+      {parent.children.length > 0 && (
+        <ul>
+          {parent.children.map((child) => (
+            <li key={child.id}>
+              <Link
+                href={categoryHref(child.slug)}
+                className="text-sm text-secondary hover:bg-slate-200"
+              >
+                {child.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  ));
+}
+
 export function NavbarLanding() {
   const pathname = usePathname();
+  const {
+    data: categories = [],
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+  } = useCategoryTree();
+
+  const categoryMenu = (
+    <CategoryMenuItems
+      categories={categories}
+      isLoading={isCategoryLoading}
+      isError={isCategoryError}
+    />
+  );
 
   const linkClass = (href: string) =>
     `rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
@@ -70,13 +131,7 @@ export function NavbarLanding() {
               </li>
               <li>
                 <span className="menu-title">Kategori & Olahraga</span>
-                <ul>
-                  {CATEGORY_LINKS.map((l) => (
-                    <li key={l.href}>
-                      <Link href={l.href}>{l.label}</Link>
-                    </li>
-                  ))}
-                </ul>
+                <ul>{categoryMenu}</ul>
               </li>
               <li>
                 <span className="menu-title">Tipe Tiket</span>
@@ -121,7 +176,15 @@ export function NavbarLanding() {
               </Link>
             </li>
             <li>
-              <Dropdown label="Kategori & Olahraga" items={CATEGORY_LINKS} />
+              <details className="dropdown">
+                <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-secondary hover:text-primary [&::-webkit-details-marker]:hidden">
+                  Kategori & Olahraga
+                  <FiChevronDown size={14} />
+                </summary>
+                <ul className="menu dropdown-content z-50 mt-2 max-h-96 w-60 flex-nowrap overflow-y-auto rounded-xl border border-gray-100 bg-white p-2 shadow-lg">
+                  {categoryMenu}
+                </ul>
+              </details>
             </li>
             <li>
               <Dropdown label="Tipe Tiket" items={TICKET_TYPE_LINKS} />
@@ -132,7 +195,7 @@ export function NavbarLanding() {
         {/* Kanan: aksi */}
         <div className="navbar-end gap-3">
           <Link
-            href="/events/create"
+            href="/organizer/events"
             className="btn btn-sm h-9 rounded-full border-none bg-primary px-5 text-white hover:brightness-110"
           >
             Buat Event
