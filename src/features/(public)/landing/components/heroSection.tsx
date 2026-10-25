@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useDebounce } from "use-debounce";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -23,7 +24,7 @@ import {
 import { MdQrCode2 } from "react-icons/md";
 
 import { CITY_OPTIONS, POPULAR_PILLS } from "../constants/heroData";
-import { useDebounce } from "../hooks/useDebounce";
+import { MIN_SEARCH_LENGTH, useSearchEvents } from "../hooks/useSearchEvents";
 import { useUpcomingEvents } from "../hooks/useUpcomingEvents";
 import { SearchSchema, searchSchema } from "../validation/searchSchema";
 
@@ -73,20 +74,25 @@ export function HeroSection() {
 
   const keyword = watch("keyword");
   const city = watch("city");
-  const debouncedKeyword = useDebounce(keyword, 500);
+  // request suggestion baru jalan 500ms setelah user berhenti mengetik
+  const [debouncedKeyword] = useDebounce(keyword, 500);
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false);
 
-  // Jalan otomatis 500ms setelah user berhenti mengetik
-  useEffect(() => {
-    if (debouncedKeyword.trim().length < 2) return;
+  const {
+    data: suggestions = [],
+    isFetching: isSuggestFetching,
+    isError: isSuggestError,
+  } = useSearchEvents(debouncedKeyword, city);
 
-    // TODO: ganti dengan useQuery (@tanstack/react-query) / API call suggestion
-    console.log("Search (debounced):", { keyword: debouncedKeyword, city });
-  }, [debouncedKeyword, city]);
+  const showSuggest =
+    isSuggestOpen && debouncedKeyword.trim().length >= MIN_SEARCH_LENGTH;
 
+  // nama param disamakan dengan query GET /events di BE (search & location)
   const onSubmit = (data: SearchSchema) => {
     const params = new URLSearchParams();
-    if (data.keyword.trim()) params.set("q", data.keyword.trim());
-    if (data.city) params.set("city", data.city);
+    if (data.keyword.trim()) params.set("search", data.keyword.trim());
+    if (data.city) params.set("location", data.city);
+    setIsSuggestOpen(false);
     router.push(`/events?${params.toString()}`);
   };
 
@@ -278,15 +284,72 @@ export function HeroSection() {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-2 md:flex-row"
           >
-            <label className="flex h-11 flex-1 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40">
-              <FiSearch className="shrink-0 text-gray-400" />
-              <input
-                type="search"
-                placeholder="Cari race maraton, liga mini soccer, turnamen esports..."
-                className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-gray-400"
-                {...register("keyword")}
-              />
-            </label>
+            <div className="relative flex-1">
+              <label className="flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40">
+                <FiSearch className="shrink-0 text-gray-400" />
+                <input
+                  type="search"
+                  autoComplete="off"
+                  placeholder="Cari race maraton, liga mini soccer, turnamen esports..."
+                  className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-gray-400"
+                  {...register("keyword", {
+                    onChange: () => setIsSuggestOpen(true),
+                    onBlur: () => setIsSuggestOpen(false),
+                  })}
+                  onFocus={() => setIsSuggestOpen(true)}
+                />
+              </label>
+
+              {/* Dropdown suggestion */}
+              {showSuggest && (
+                <ul
+                  // preventDefault supaya input tidak blur (dropdown tidak ketutup) sebelum link ke klik
+                  onMouseDown={(e) => e.preventDefault()}
+                  className="absolute left-0 right-0 top-12 z-30 max-h-72 overflow-y-auto rounded-xl border border-gray-100 bg-white p-1 shadow-lg"
+                >
+                  {isSuggestFetching && suggestions.length === 0 ? (
+                    <li className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400">
+                      <span className="loading loading-spinner loading-xs" />
+                      Mencari event...
+                    </li>
+                  ) : isSuggestError ? (
+                    <li className="px-3 py-2 text-xs text-red-500">
+                      Gagal memuat hasil pencarian
+                    </li>
+                  ) : suggestions.length === 0 ? (
+                    <li className="px-3 py-2 text-xs text-gray-400">
+                      Event &quot;{debouncedKeyword}&quot; tidak ditemukan
+                    </li>
+                  ) : (
+                    <>
+                      {suggestions.map((event) => (
+                        <li key={event.id}>
+                          <Link
+                            href={`/events/${event.slug}`}
+                            className="flex flex-col rounded-lg px-3 py-2 hover:bg-neutral"
+                          >
+                            <span className="truncate text-sm font-medium text-secondary">
+                              {event.title}
+                            </span>
+                            <span className="truncate text-[11px] text-gray-400">
+                              {event.categories?.name} • {event.location}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                      <li>
+                        <button
+                          type="submit"
+                          className="w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-primary hover:bg-neutral"
+                        >
+                          Lihat semua hasil &quot;{debouncedKeyword}&quot;
+                        </button>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              )}
+            </div>
 
             <label className="relative flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40 md:w-44">
               <FiMapPin className="shrink-0 text-gray-400" />
