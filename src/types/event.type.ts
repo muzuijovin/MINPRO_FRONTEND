@@ -27,6 +27,23 @@ export type EventItem = {
   };
 };
 
+// voucher yang masih berlaku, ikut di response GET /events/:slug
+export type EventVoucher = {
+  id: string;
+  code: string;
+  discountPercentage: number;
+  quota: number;
+  startAt: string;
+  endAt: string;
+};
+
+// GET /events/:slug = EventItem + voucher aktif + ringkasan rating
+export type EventDetail = EventItem & {
+  eventVoucher: EventVoucher[];
+  averageRating: number;
+  totalReviews: number;
+};
+
 // meta pagination dari GET /events (beda dengan PaginationMeta umum: pakai totalEvents)
 export type EventListMeta = {
   page: number;

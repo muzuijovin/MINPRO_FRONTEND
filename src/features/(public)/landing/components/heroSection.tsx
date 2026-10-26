@@ -240,7 +240,7 @@ export function HeroSection() {
               type="button"
               aria-label="Slide sebelumnya"
               onClick={() => scrollToSlide(activeIndex - 1)}
-              className="btn btn-circle btn-sm absolute left-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+              className="btn btn-circle btn-sm absolute left-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
             >
               <FiChevronLeft size={18} />
             </button>
@@ -248,7 +248,7 @@ export function HeroSection() {
               type="button"
               aria-label="Slide berikutnya"
               onClick={() => scrollToSlide(activeIndex + 1)}
-              className="btn btn-circle btn-sm absolute right-3 top-1/2 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+              className="btn btn-circle btn-sm absolute right-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
             >
               <FiChevronRight size={18} />
             </button>
