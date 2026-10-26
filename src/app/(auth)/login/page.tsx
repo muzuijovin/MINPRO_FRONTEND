@@ -22,7 +22,7 @@ export default function LoginPage() {
 
     try {
       // 1. Kirim data login ke backend
-      const response = await axiosInstance.post('/api/auth/login', {
+      const response = await axiosInstance.post('/auth/login', {
         identifier: identifier.trim(),
         password,
       });
