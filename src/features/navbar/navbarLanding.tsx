@@ -30,7 +30,7 @@ function Dropdown({ label, items }: { label: string; items: NavLink[] }) {
       <ul className="menu dropdown-content z-50 mt-2 w-56 rounded-xl border border-gray-100 bg-white p-2 shadow-lg">
         {items.map((item) => (
           <li key={item.href}>
-            <Link href={item.href} className="text-sm text-secondary">
+            <Link href={item.href} className="text-sm text-secondary hover:bg-slate-200">
               {item.label}
             </Link>
           </li>
@@ -139,7 +139,9 @@ export function NavbarLanding() {
                 <ul>
                   {TYPE_PRICE_LINKS.map((l) => (
                     <li key={l.href}>
-                      <Link href={l.href}>{l.label}</Link>
+                      <Link href={l.href} className="hover:bg-slate-200">
+                        {l.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
