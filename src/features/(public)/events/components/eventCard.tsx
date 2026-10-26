@@ -18,13 +18,13 @@ export function EventCard({ event }: { event: EventItem }) {
 
   return (
     <article className="flex flex-col overflow-hidden rounded-xl bg-white shadow-sm">
-      <div className="relative h-48 w-full bg-[#eee]">
+      <div className="group relative h-48 w-full bg-[#eee]">
         <Image
           src={event.coverImageUrl}
           alt={event.title}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
         />
         <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold tracking-[0.22px] text-white">
           {event.categories?.name}
@@ -65,7 +65,7 @@ export function EventCard({ event }: { event: EventItem }) {
             <span className="text-[11px] font-semibold tracking-[0.22px] text-[#5a4137]">
               {isFree ? "Harga" : "Mulai Dari"}
             </span>
-            <span className="text-lg font-bold leading-[26px] text-primary">
+            <span className="text-lg font-bold leading-6.5 text-primary">
               {isFree ? "Gratis" : formatRupiah(Number(event.price))}
             </span>
           </div>
