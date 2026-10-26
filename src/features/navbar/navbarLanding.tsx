@@ -159,8 +159,8 @@ export function NavbarLanding() {
                 className="object-cover"
               />
             </span>
-            <span className="text-base font-bold text-primary">
-              {BRAND_NAME}
+            <span className="text-base font-bold leading-6 tracking-[-0.4px] text-[#1a1c1c]">
+              Sport<span className="text-primary">Ticketing</span>
             </span>
           </Link>
         </div>
