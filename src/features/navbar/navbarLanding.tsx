@@ -3,10 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiChevronDown, FiMenu, FiUser } from "react-icons/fi";
+import { FiChevronDown, FiMenu } from "react-icons/fi";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
 import { TYPE_PRICE_OPTIONS } from "@/features/organizer/events/constants/createEventData";
+import { useLogout } from "@/features/auth/hooks/useLogout";
+import { useAuthStore } from "@/store/useAuthStore";
 import { CategoryTree } from "@/types/category.type";
+import { AccountMenu } from "./components/accountMenu";
+import { ACCOUNT_LINKS, CREATE_EVENT_HREF, isUserRole } from "./constant/navbarData";
 
 const BRAND_NAME = "SportTicketing";
 
@@ -92,6 +96,10 @@ function CategoryMenuItems({
 
 export function NavbarLanding() {
   const pathname = usePathname();
+  // diisi AuthSync dari GET /auth/me; role kosong = belum login
+  const { username, email, role, isChecked } = useAuthStore();
+  const userRole = isUserRole(role) ? role : null;
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const {
     data: categories = [],
     isLoading: isCategoryLoading,
@@ -146,6 +154,60 @@ export function NavbarLanding() {
                   ))}
                 </ul>
               </li>
+              {/* menu akun versi mobile, sesuai role */}
+              {isChecked && (
+                <li>
+                  <span className="menu-title">Akun</span>
+                  <ul>
+                    {userRole ? (
+                      <>
+                        {userRole === "EO" && (
+                          <li>
+                            <Link href={CREATE_EVENT_HREF} className="hover:bg-slate-200">
+                              Buat Event
+                            </Link>
+                          </li>
+                        )}
+                        {ACCOUNT_LINKS[userRole].map((l) => (
+                          <li key={l.href}>
+                            <Link href={l.href} className="hover:bg-slate-200">
+                              {l.label}
+                            </Link>
+                          </li>
+                        ))}
+                        <li>
+                          <button
+                            type="button"
+                            disabled={isLoggingOut}
+                            onClick={() => logout()}
+                            className="text-red-600 hover:bg-red-50"
+                          >
+                            {isLoggingOut ? "Keluar..." : "Keluar"}
+                          </button>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          <Link href={CREATE_EVENT_HREF} className="hover:bg-slate-200">
+                            Buat Event
+                          </Link>
+                        </li>
+                        <li>
+                          <Link href="/login" className="hover:bg-slate-200">
+                            Masuk
+                          </Link>
+                        </li>
+                        <li>
+                          <Link href="/register" className="hover:bg-slate-200">
+                            Daftar
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </li>
+              )}
             </ul>
           </details>
 
@@ -195,28 +257,43 @@ export function NavbarLanding() {
           </ul>
         </div>
 
-        {/* Kanan: aksi */}
+        {/* Kanan: aksi, beda untuk tamu / CUSTOMER / EO */}
         <div className="navbar-end gap-3">
-          <Link
-            href="/organizer/events"
-            className="btn btn-sm h-9 rounded-full border-none bg-primary px-5 text-white hover:brightness-110"
-          >
-            Buat Event
-          </Link>
-          <span className="hidden h-6 w-px bg-gray-200 sm:block" />
-          <Link
-            href="/login"
-            className="hidden text-sm font-medium text-secondary hover:text-primary sm:block"
-          >
-            Masuk
-          </Link>
-          <Link
-            href="/login"
-            aria-label="Akun"
-            className="btn btn-circle btn-sm h-9 w-9 border-none bg-gray-100 text-secondary hover:bg-gray-200"
-          >
-            <FiUser size={16} />
-          </Link>
+          {!isChecked ? (
+            // session masih dicek -> placeholder supaya tombol tamu tidak sempat "kedip"
+            <span className="h-9 w-32 animate-pulse rounded-full bg-gray-100" />
+          ) : (
+            <>
+              {/* tampil untuk tamu & EO; guard EO ada di halaman create setelah halaman sambutan */}
+              {userRole !== "CUSTOMER" && (
+                <Link
+                  href={CREATE_EVENT_HREF}
+                  className="btn btn-sm hidden h-9 rounded-full border-none bg-primary px-5 text-white hover:brightness-110 sm:inline-flex"
+                >
+                  Buat Event
+                </Link>
+              )}
+              {userRole ? (
+                <AccountMenu username={username} email={email} role={userRole} />
+              ) : (
+                <>
+                  <span className="hidden h-6 w-px bg-gray-200 sm:block" />
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-secondary hover:text-primary"
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="btn btn-sm h-9 rounded-full border border-primary bg-white px-5 text-primary shadow-none hover:bg-primary/10"
+                  >
+                    Daftar
+                  </Link>
+                </>
+              )}
+            </>
+          )}
         </div>
       </nav>
     </header>

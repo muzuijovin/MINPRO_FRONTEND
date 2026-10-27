@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { toast } from 'react-toastify';
 
 type AccountType = 'CUSTOMER' | 'EO';
 
@@ -129,6 +130,7 @@ export default function RegisterPage() {
       setSuccess(
         'Registration successful! Your Jovlen account has been created. You can now sign in.',
       );
+      toast.success('Registrasi berhasil! Silakan masuk dengan akun barumu.');
       setEmail('');
       setUsername('');
       setPassword('');

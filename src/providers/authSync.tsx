@@ -12,7 +12,13 @@ export default function AuthSync() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   useEffect(() => {
-    if (isSuccess && data) setAuth(data.email, data.role);
+    if (isSuccess && data)
+      setAuth({
+        // fallback ke bagian depan email selama BE belum kirim username
+        username: data.username ?? data.email.split("@")[0],
+        email: data.email,
+        role: data.role,
+      });
     else if (isSuccess || isError) clearAuth();
   }, [data, isSuccess, isError, setAuth, clearAuth]);
 
