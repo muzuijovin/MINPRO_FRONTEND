@@ -12,15 +12,24 @@ export default function withAuthGuard<P extends object>(
 ) {
   return function AuthGuardComponent(props: P) {
     const router = useRouter();
-    const { role } = useAuthStore();
+    const { role, isChecked } = useAuthStore();
     const isAuthorized = allowedRoles.includes(role);
 
     useEffect(() => {
-      if (isAuthorized) return;
+      // tunggu hasil GET /auth/me dulu, jangan redirect selagi session masih dicek
+      if (!isChecked || isAuthorized) return;
 
       const timer = setTimeout(() => router.replace('/'), REDIRECT_DELAY);
       return () => clearTimeout(timer);
-    }, [isAuthorized, router]);
+    }, [isChecked, isAuthorized, router]);
+
+    if (!isChecked) {
+      return (
+        <main className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-[#FAF8FF]">
+          <span className="loading loading-spinner loading-md text-[#E85D2A]" />
+        </main>
+      );
+    }
 
     if (!isAuthorized) {
       return (

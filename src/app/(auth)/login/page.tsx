@@ -1,52 +1,56 @@
-'use client';
-import { axiosInstance } from '@/lib/axios-instance.lib';
-import { useState, type FormEvent } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+"use client";
+
+import { axiosInstance } from "@/lib/axios-instance.lib";
+import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError('');
+    setError("");
     setIsSubmitting(true);
 
     try {
-      // 1. Kirim data login ke backend
-      const response = await axiosInstance.post('/auth/login', {
-        identifier: identifier.trim(),
+      // 1. Kirim email dan password ke backend
+      const response = await axiosInstance.post("/auth/login", {
+        email: email.trim(),
         password,
       });
 
       // 2. Tampilkan pesan jika login berhasil
-      console.log('Login berhasil:', response.data);
+      console.log("Login berhasil:", response.data);
 
-      // 3. Kembali ke halaman utama
-      router.push('/');
+      // 3. Cek ulang GET /auth/me supaya role di useAuthStore langsung terisi
+      await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+
+      // 4. Kembali ke halaman utama
+      router.push("/");
       router.refresh();
     } catch (error: any) {
-      // 4. Tampilkan pesan jika login gagal
-      console.error('Login gagal:', error.response?.data || error.message);
+      // 5. Tampilkan pesan jika login gagal
+      console.error("Login gagal:", error.response?.data || error.message);
 
       setError(
         error.response?.data?.message ||
-          'Could not connect to the server. Please check your credentials.',
+          "Could not connect to the server. Please check your credentials.",
       );
     } finally {
-      // 5. Aktifkan kembali tombol login
+      // 6. Aktifkan kembali tombol login
       setIsSubmitting(false);
     }
   }
-
 
   return (
     <div className="flex min-h-[calc(100vh-80px)] flex-col">
@@ -55,7 +59,7 @@ export default function LoginPage() {
         {/* Ambient light effects */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F4DDF1]/40 blur-[100px]"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-105 w-130 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F4DDF1]/40 blur-[100px]"
         />
 
         <div
@@ -64,7 +68,7 @@ export default function LoginPage() {
         />
 
         {/* Login card */}
-        <section className="relative z-10 w-full max-w-[368px] rounded-xl border border-[#EAE7F0] bg-white p-5 shadow-[0_4px_12px_-4px_rgba(16,33,59,0.16)]">
+        <section className="relative z-10 w-full max-w-92 rounded-xl border border-[#EAE7F0] bg-white p-5 shadow-[0_4px_12px_-4px_rgba(16,33,59,0.16)]">
           {/* Header section */}
           <div className="mb-6">
             <h1 className="text-xl font-semibold leading-7 tracking-[-0.4px] text-[#10213B]">
@@ -78,23 +82,23 @@ export default function LoginPage() {
 
           {/* Login form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email address or username */}
+            {/* Email Address */}
             <div>
               <label
-                htmlFor="identifier"
+                htmlFor="email"
                 className="mb-2 block text-xs font-medium text-[#10213B]"
               >
-                Email Address or Username
+                Email
               </label>
 
               <input
-                id="identifier"
-                name="identifier"
-                type="text"
-                autoComplete="username"
-                placeholder="name@example.com or username"
-                value={identifier}
-                onChange={(event) => setIdentifier(event.target.value)}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 required
                 className="h-10 w-full rounded-md border border-[#F0EDEB] bg-white px-3 text-xs text-[#10213B] outline-none transition placeholder:text-[#D9B8AA] focus:border-[#E85D2A] focus:ring-2 focus:ring-[#E85D2A]/10"
               />
@@ -113,7 +117,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   value={password}
@@ -124,7 +128,7 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword((current) => !current)}
                   className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-[#8B817D] hover:text-[#10213B]"
                 >
@@ -191,7 +195,7 @@ export default function LoginPage() {
               disabled={isSubmitting}
               className="flex h-11 w-full items-center justify-center rounded-md bg-[#E85D2A] text-sm font-semibold text-white transition-colors hover:bg-[#D94D1D] focus:outline-none focus:ring-2 focus:ring-[#E85D2A]/30 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? 'Signing In...' : 'Sign In'}
+              {isSubmitting ? "Signing In..." : "Sign In"}
             </button>
 
             {/* Create account link */}
