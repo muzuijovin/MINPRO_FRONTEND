@@ -2,7 +2,8 @@
 import { CreateEventTemplate } from "@/features/organizer/events/components/create/createEvent";
 import withAuthGuard from "@/hoc/withAuthGuard";
 
-export function CreateEvent() {
+// page.tsx cuma boleh export default (+ metadata dll), jadi komponen ini tidak di-export
+function CreateEvent() {
   return (
     <>
       <CreateEventTemplate />

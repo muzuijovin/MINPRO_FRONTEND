@@ -3,6 +3,8 @@ import { axiosInstance } from "@/lib/axios-instance.lib";
 import { ApiResponse } from "@/types/api-response.type";
 
 export type SessionUser = {
+  // username baru ada kalau BE /auth/me ikut select username
+  username?: string;
   email: string;
   role: string;
 };

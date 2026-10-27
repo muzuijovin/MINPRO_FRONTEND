@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import QueryProvider from "../providers/queryProviders";
 import AuthSync from "../providers/authSync";
+import ToastProvider from "../providers/toastProvider";
 
 export const metadata: Metadata = {
   title: "JOVLEN",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <QueryProvider>
           <AuthSync />
           {children}
+          <ToastProvider />
         </QueryProvider>
       </body>
     </html>

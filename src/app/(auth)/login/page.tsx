@@ -5,6 +5,8 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { ApiResponse } from "@/types/api-response.type";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,16 +26,18 @@ export default function LoginPage() {
 
     try {
       // 1. Kirim email dan password ke backend
-      const response = await axiosInstance.post("/auth/login", {
+      const response = await axiosInstance.post<ApiResponse<{ username: string }>>("/auth/login", {
         email: email.trim(),
         password,
       });
 
-      // 2. Tampilkan pesan jika login berhasil
-      console.log("Login berhasil:", response.data);
-
-      // 3. Cek ulang GET /auth/me supaya role di useAuthStore langsung terisi
+      // 2. Cek ulang GET /auth/me supaya role di useAuthStore langsung terisi
       await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+
+      // 3. Tampilkan pesan jika login berhasil
+      toast.success(
+        `Login berhasil! Selamat datang, ${response.data?.data?.username ?? ""}`.trim(),
+      );
 
       // 4. Kembali ke halaman utama
       router.push("/");
