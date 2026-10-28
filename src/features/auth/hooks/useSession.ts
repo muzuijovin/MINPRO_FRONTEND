@@ -21,5 +21,8 @@ export function useSession() {
       return res?.data?.data;
     },
     retry: false,
+    // selama masih login, cek ulang tiap 1 menit supaya token expired (15m) langsung ketahuan walau user diam
+    refetchInterval: (query) =>
+      query.state.status === "success" && query.state.data ? 60 * 1000 : false,
   });
 }

@@ -31,7 +31,8 @@ export type EventItem = {
 export type EventVoucher = {
   id: string;
   code: string;
-  discountPercentage: number;
+  // Prisma Decimal dikirim sebagai string di JSON
+  discountPercentage: string | number;
   quota: number;
   startAt: string;
   endAt: string;

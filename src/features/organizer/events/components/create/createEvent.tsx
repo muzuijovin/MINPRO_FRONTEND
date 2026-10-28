@@ -7,6 +7,9 @@ import {
 } from "@/features/validation/createEventSchema";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
 import { axiosInstance } from "@/lib/axios-instance.lib";
+import { toDateTimeLocal } from "@/lib/datetime.lib";
+import { ApiResponse } from "@/types/api-response.type";
+import { EventItem } from "@/types/event.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -102,8 +105,7 @@ export function CreateEventTemplate() {
     mutationFn: async (data: CreateEventFormValues) => {
       // backend pakai multer, jadi kirim sebagai FormData (bukan JSON)
       const fd = new FormData();
-      // TODO: ganti dengan id organizer dari user yang login kalau fitur auth sudah jadi
-      fd.append("organizerId", process.env.NEXT_PUBLIC_TEMP_ORGANIZER_ID ?? "");
+      // organizerId tidak dikirim, BE ambil dari token di cookie (withCredentials)
       // parentCategoryId sengaja tidak dikirim, hanya dipakai di form
       fd.append("categoryId", data?.categoryId);
       fd.append("title", data?.title);
@@ -118,12 +120,17 @@ export function CreateEventTemplate() {
       // nama field harus sama dengan route backend: { name: "coverImage" }
       fd.append("coverImage", data?.coverImage[0]);
 
-      await axiosInstance.post("/events", fd);
+      const res = await axiosInstance.post<ApiResponse<EventItem>>(
+        "/events",
+        fd,
+      );
+      return res?.data?.data;
     },
-    onSuccess() {
+    onSuccess(event) {
       toast.success("Event berhasil dibuat!");
       reset();
-      router.push("/organizer/events");
+      // lanjut ke step opsional: bikin voucher untuk event yang baru dibuat
+      router.push(`/organizer/events/create/createVoucher?slug=${event?.slug}`);
     },
     onError(error) {
       if (error instanceof AxiosError) {
@@ -156,6 +163,8 @@ export function CreateEventTemplate() {
   );
 
   const title = useWatch({ control, name: "title" });
+  // waktu selesai tidak boleh sebelum waktu mulai
+  const startsAt = useWatch({ control, name: "startsAt" });
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
@@ -432,6 +441,10 @@ export function CreateEventTemplate() {
                 id="startsAt"
                 type="datetime-local"
                 className={inputCls}
+                // min diisi waktu sekarang saat input dibuka (bukan saat render, biar tidak beda antara server & browser)
+                onFocus={(e) => {
+                  e.currentTarget.min = toDateTimeLocal(new Date());
+                }}
                 {...register("startsAt")}
               />
               <p className={errorCls}>{errors.startsAt?.message}</p>
@@ -447,6 +460,7 @@ export function CreateEventTemplate() {
               <input
                 id="endsAt"
                 type="datetime-local"
+                min={startsAt || undefined}
                 className={inputCls}
                 {...register("endsAt")}
               />
@@ -554,8 +568,8 @@ export function CreateEventTemplate() {
           <div className="flex gap-2 rounded-lg bg-neutral p-3 text-xs text-secondary/70">
             <FiInfo className="mt-0.5 shrink-0" />
             <span>
-              Voucher promosi untuk event ini bisa dibuat di dashboard setelah
-              event berhasil diterbitkan.
+              Setelah event diterbitkan, kamu bisa langsung membuat voucher
+              promosi untuk event ini.
             </span>
           </div>
         </SectionCard>

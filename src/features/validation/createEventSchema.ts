@@ -79,6 +79,15 @@ export const createEventFormSchema = z
       });
     }
 
+    // event baru tidak boleh dijadwalkan di waktu yang sudah lewat
+    if (data.startsAt && new Date(data.startsAt) <= new Date()) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["startsAt"],
+        message: "Waktu mulai harus setelah waktu sekarang",
+      });
+    }
+
     if (
       data.startsAt &&
       data.endsAt &&
