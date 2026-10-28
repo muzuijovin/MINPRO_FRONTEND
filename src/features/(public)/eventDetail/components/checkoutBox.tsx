@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { FiArrowRight, FiMinus, FiPlus, FiShield } from "react-icons/fi";
+import { FiArrowRight, FiMinus, FiPlus, FiShield, FiTag } from "react-icons/fi";
 import { MdOutlineLocalFireDepartment, MdQrCode2 } from "react-icons/md";
 import { EventDetail } from "@/types/event.type";
-import { formatRupiah } from "../utils/formatters";
+import { formatDate, formatRupiah } from "../utils/formatters";
 
 const MAX_TICKET_PER_ACCOUNT = 5;
 
@@ -16,12 +16,25 @@ const ASSURANCES = [
 
 export function CheckoutBox({ event }: { event: EventDetail }) {
   const [quantity, setQuantity] = useState(1);
+  // null = tanpa voucher
+  const [voucherId, setVoucherId] = useState<string | null>(null);
 
   const isFree = event.typePrice === "FREE";
   const price = isFree ? 0 : Number(event.price);
   const isEnded = !!event.endsAt && new Date(event.endsAt) < new Date();
   const isSoldOut = event.quota <= 0;
   const maxQuantity = Math.max(1, Math.min(MAX_TICKET_PER_ACCOUNT, event.quota));
+
+  // BE cuma kirim voucher yang masih berlaku & kuotanya > 0, event gratis tidak perlu voucher
+  const vouchers = isFree ? [] : event.eventVoucher;
+  const selectedVoucher = vouchers.find((voucher) => voucher.id === voucherId);
+
+  // perkiraan harga di FE, harga final tetap dihitung ulang BE waktu transaksi dibuat
+  const subtotal = price * quantity;
+  const voucherDiscount = selectedVoucher
+    ? Math.floor((subtotal * Number(selectedVoucher.discountPercentage)) / 100)
+    : 0;
+  const total = subtotal - voucherDiscount;
 
   return (
     <aside className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-md lg:sticky lg:top-24">
@@ -82,13 +95,75 @@ export function CheckoutBox({ event }: { event: EventDetail }) {
         </div>
       </div>
 
+      {vouchers.length > 0 && (
+        <fieldset className="flex flex-col gap-2 rounded-xl bg-[#f3f3f3] p-4">
+          <legend className="sr-only">Pilih voucher</legend>
+          <div>
+            <p className="flex items-center gap-1.5 text-sm font-bold leading-5 text-[#1a1c1c]">
+              <FiTag className="text-[#a43e00]" />
+              Voucher Promo
+            </p>
+            <p className="text-xs leading-4.5 text-[#5a4137]">
+              1 voucher per transaksi, tiap akun hanya bisa memakai voucher yang sama 1 kali
+            </p>
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg bg-white p-3 text-[13px] font-medium text-[#1a1c1c] has-checked:ring-1 has-checked:ring-primary">
+            <input
+              type="radio"
+              name="voucher"
+              className="radio radio-primary radio-xs"
+              checked={voucherId === null}
+              onChange={() => setVoucherId(null)}
+            />
+            Tanpa voucher
+          </label>
+
+          {vouchers.map((voucher) => (
+            <label
+              key={voucher.id}
+              className="flex cursor-pointer items-center gap-3 rounded-lg bg-white p-3 has-checked:ring-1 has-checked:ring-primary"
+            >
+              <input
+                type="radio"
+                name="voucher"
+                className="radio radio-primary radio-xs"
+                checked={voucherId === voucher.id}
+                onChange={() => setVoucherId(voucher.id)}
+              />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="flex items-center justify-between gap-2">
+                  <span className="truncate font-mono text-[13px] font-bold tracking-wider text-[#1a1c1c]">
+                    {voucher.code}
+                  </span>
+                  <span className="shrink-0 text-[13px] font-bold text-[#a43e00]">
+                    -{Number(voucher.discountPercentage)}%
+                  </span>
+                </span>
+                <span className="text-[11px] leading-4 text-[#5a4137]">
+                  Sisa {voucher.quota} • s/d {formatDate(voucher.endAt, "d MMM yyyy")}
+                </span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
+
       <div className="flex flex-col gap-2 rounded-xl bg-[#eee] p-4">
         <div className="flex items-center justify-between text-xs leading-4.5">
           <span className="text-[#5a4137]">{quantity}x Tiket</span>
           <span className="font-medium text-[#1a1c1c]">
-            {isFree ? "Gratis" : formatRupiah(price * quantity)}
+            {isFree ? "Gratis" : formatRupiah(subtotal)}
           </span>
         </div>
+        {selectedVoucher && (
+          <div className="flex items-center justify-between text-xs leading-4.5">
+            <span className="text-[#5a4137]">Voucher {selectedVoucher.code}</span>
+            <span className="font-semibold text-[#006c49]">
+              -{formatRupiah(voucherDiscount)}
+            </span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-xs leading-4.5">
           <span className="text-[#5a4137]">Biaya Layanan</span>
           <span className="font-semibold text-[#006c49]">Termasuk</span>
@@ -100,12 +175,12 @@ export function CheckoutBox({ event }: { event: EventDetail }) {
             <p className="text-xs leading-4.5">Untuk {quantity} tiket</p>
           </div>
           <p className="text-2xl font-bold leading-9 tracking-[-0.56px] text-[#a43e00]">
-            {isFree ? "Gratis" : formatRupiah(price * quantity)}
+            {isFree ? "Gratis" : formatRupiah(total)}
           </p>
         </div>
       </div>
 
-      {/* TODO: arahkan ke halaman transaksi kalau fiturnya sudah ada */}
+      {/* TODO (branch transaction): arahkan ke /checkout?slug=...&qty={quantity}&voucherId={voucherId} */}
       <button
         type="button"
         disabled={isEnded || isSoldOut}
