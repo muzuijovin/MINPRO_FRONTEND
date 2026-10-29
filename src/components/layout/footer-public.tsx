@@ -53,7 +53,7 @@ const BADGES = [
 ];
 
 const linkClass =
-  "text-xs leading-4 text-[#5a4137] transition-colors hover:text-primary";
+  "text-xs leading-4 text-ink-muted transition-colors hover:text-primary";
 
 function FooterColumn({
   title,
@@ -64,7 +64,7 @@ function FooterColumn({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-bold leading-5 text-[#1a1c1c]">{title}</h3>
+      <h3 className="text-sm font-bold leading-5 text-ink">{title}</h3>
       <ul className="flex flex-col gap-2.5">{children}</ul>
     </div>
   );
@@ -101,12 +101,12 @@ export default function FooterPublic() {
                   className="object-cover"
                 />
               </span>
-              <span className="text-base font-bold leading-6 tracking-[-0.4px] text-[#1a1c1c]">
+              <span className="text-base font-bold leading-6 tracking-[-0.4px] text-ink">
                 Sport<span className="text-primary">Ticketing</span>
               </span>
             </Link>
 
-            <p className="max-w-80 text-xs leading-5 text-[#5a4137]">
+            <p className="max-w-80 text-xs leading-5 text-ink-muted">
               Platform resmi ticketing dan pendaftaran event olahraga terdepan
               di Indonesia. Menghubungkan penyelenggara lomba, komunitas, atlet,
               dan suporter dalam satu ekosistem terpadu.
@@ -121,7 +121,7 @@ export default function FooterPublic() {
                     width={contact.width}
                     height={contact.height}
                   />
-                  <span className="text-[11px] leading-4 text-[#5a4137]">
+                  <span className="text-xs leading-4 text-ink-muted">
                     {contact.text}
                   </span>
                 </li>
@@ -159,7 +159,7 @@ export default function FooterPublic() {
 
         {/* Copyright + badge */}
         <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] leading-4 text-[#5a4137]">
+          <p className="text-xs leading-4 text-ink-muted">
             © 2025 PT SportTicketing Indonesia. Hak Cipta Dilindungi.
           </p>
 
@@ -172,7 +172,7 @@ export default function FooterPublic() {
                   width={10.6667}
                   height={13.3333}
                 />
-                <span className="text-[11px] leading-4 text-[#5a4137]">
+                <span className="text-xs leading-4 text-ink-muted">
                   {badge.text}
                 </span>
               </div>

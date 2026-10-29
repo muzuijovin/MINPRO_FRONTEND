@@ -12,11 +12,15 @@ export const CATEGORY_COLORS: Record<string, CategoryColor> = {
 
 const DEFAULT_COLOR: CategoryColor = { solid: "bg-ink-muted", dot: "bg-ink-muted" };
 
-// slug bisa parent ("running") atau sub category ("5k") -> cari warna parent nya
-export function getCategoryColor(slug: string | undefined, tree: CategoryTree[]) {
-  if (!slug) return DEFAULT_COLOR;
-  const parent = tree.find(
+// slug bisa parent ("running") atau sub category ("5k") -> cari parent nya
+export function findParentCategory(slug: string | undefined, tree: CategoryTree[]) {
+  if (!slug) return undefined;
+  return tree.find(
     (p) => p.slug === slug || p.children.some((child) => child.slug === slug),
   );
+}
+
+export function getCategoryColor(slug: string | undefined, tree: CategoryTree[]) {
+  const parent = findParentCategory(slug, tree);
   return CATEGORY_COLORS[parent?.slug ?? ""] ?? DEFAULT_COLOR;
 }
