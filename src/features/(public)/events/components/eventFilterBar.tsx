@@ -12,6 +12,7 @@ import {
   FiSliders,
 } from "react-icons/fi";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
+import { getCategoryColor } from "../constants/categoryColors";
 import { EventFilters } from "../hooks/useEventFilters";
 import { useActiveEventsCount, useEventLocations } from "../hooks/useEvents";
 
@@ -24,15 +25,15 @@ type Props = {
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text";
 
-// chip aktif pakai accent-text (bukan primary) supaya teks putihnya lolos kontras 4.5:1
-const chipCls = (active: boolean) =>
+// chip aktif pakai warna kategori nya (lolos kontras 4.5:1 dengan teks putih), "Semua" pakai ink (netral)
+const chipCls = (active: boolean, activeBg = "bg-ink") =>
   `flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-colors ${focusRing} ${
-    active ? "bg-accent-text text-white shadow-sm" : "bg-surface-sunken text-ink-muted hover:bg-gray-200"
+    active ? `${activeBg} text-white shadow-sm` : "bg-surface-sunken text-ink-muted hover:bg-gray-200"
   }`;
 
-const subChipCls = (active: boolean) =>
+const subChipCls = (active: boolean, activeBg = "bg-ink") =>
   `flex min-h-8 cursor-pointer items-center rounded-full px-3 text-xs font-semibold tracking-[0.22px] transition-colors ${focusRing} ${
-    active ? "bg-accent-text text-white" : "bg-surface-sunken text-ink-muted hover:bg-gray-200"
+    active ? `${activeBg} text-white` : "bg-surface-sunken text-ink-muted hover:bg-gray-200"
   }`;
 
 export function EventFilterBar({ filters, setFilters }: Props) {
@@ -59,6 +60,7 @@ export function EventFilterBar({ filters, setFilters }: Props) {
       parent.slug === filters.category ||
       parent.children.some((child) => child.slug === filters.category),
   );
+  const activeColor = getCategoryColor(activeParent?.slug, categories).solid;
   const subCategories = activeParent
     ? activeParent.children
     : categories.flatMap((parent) => parent.children);
@@ -161,17 +163,26 @@ export function EventFilterBar({ filters, setFilters }: Props) {
               <FiGrid aria-hidden size={13} />
               Semua
             </button>
-            {categories.map((parent) => (
-              <button
-                key={parent.id}
-                type="button"
-                aria-pressed={activeParent?.id === parent.id}
-                onClick={() => setFilters({ category: parent.slug })}
-                className={chipCls(activeParent?.id === parent.id)}
-              >
-                {parent.name}
-              </button>
-            ))}
+            {categories.map((parent) => {
+              const color = getCategoryColor(parent.slug, categories);
+              const active = activeParent?.id === parent.id;
+              return (
+                <button
+                  key={parent.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setFilters({ category: parent.slug })}
+                  className={chipCls(active, color.solid)}
+                >
+                  {/* titik warna supaya kategori tetap terbedakan walau belum dipilih */}
+                  <span
+                    aria-hidden
+                    className={`size-2 rounded-full ${active ? "bg-white" : color.dot}`}
+                  />
+                  {parent.name}
+                </button>
+              );
+            })}
           </div>
 
           {subCategories.length > 0 && (
@@ -185,6 +196,7 @@ export function EventFilterBar({ filters, setFilters }: Props) {
                 onClick={() => setFilters({ category: activeParent?.slug ?? "" })}
                 className={subChipCls(
                   !filters.category || filters.category === activeParent?.slug,
+                  activeColor,
                 )}
               >
                 Semua Format
@@ -195,7 +207,10 @@ export function EventFilterBar({ filters, setFilters }: Props) {
                   type="button"
                   aria-pressed={filters.category === child.slug}
                   onClick={() => setFilters({ category: child.slug })}
-                  className={subChipCls(filters.category === child.slug)}
+                  className={subChipCls(
+                    filters.category === child.slug,
+                    getCategoryColor(child.slug, categories).solid,
+                  )}
                 >
                   {child.name}
                 </button>
