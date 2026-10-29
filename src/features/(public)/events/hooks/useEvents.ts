@@ -47,14 +47,23 @@ export function useActiveEventsCount() {
   });
 }
 
-// list lokasi unik dari GET /events/locations untuk dropdown kota
+// lokasi event bisa berisi venue + kota ("Stadion X, Surabaya"), kota = bagian setelah koma terakhir
+const toCity = (location: string) => location.split(",").pop()?.trim() ?? "";
+
+// list kota unik dari GET /events/locations untuk dropdown kota.
+// filter location di backend pakai "contains", jadi kirim nama kota tetap kena semua venue di kota itu
 export function useEventLocations() {
   return useQuery({
     queryKey: ["events", "locations"],
     queryFn: async () => {
       const res =
         await axiosInstance.get<ApiResponse<string[]>>("/events/locations");
-      return res?.data?.data;
+      const cities = new Map<string, string>();
+      for (const location of res?.data?.data ?? []) {
+        const city = toCity(location);
+        if (city && !cities.has(city.toLowerCase())) cities.set(city.toLowerCase(), city);
+      }
+      return [...cities.values()].sort((a, b) => a.localeCompare(b, "id"));
     },
     staleTime: 5 * 60 * 1000,
   });
