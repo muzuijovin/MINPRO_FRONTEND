@@ -1,5 +1,5 @@
 import { IconType } from "react-icons";
-import { FiCalendar, FiGrid, FiShoppingBag, FiTag, FiUser } from "react-icons/fi";
+import { FiCalendar, FiCreditCard, FiGrid, FiShoppingBag, FiTag, FiUser } from "react-icons/fi";
 import { MdOutlineConfirmationNumber } from "react-icons/md";
 
 export type UserRole = "CUSTOMER" | "EO";
@@ -22,6 +22,7 @@ export const ACCOUNT_LINKS: Record<UserRole, AccountLink[]> = {
     { label: "Dashboard", href: "/organizer/dashboard", icon: FiGrid },
     { label: "Event Saya", href: "/organizer/events", icon: FiCalendar },
     { label: "Voucher", href: "/organizer/voucher", icon: FiTag },
+    { label: "Kelola Transaksi", href: "/organizer/transactions", icon: FiCreditCard },
   ],
 };
 

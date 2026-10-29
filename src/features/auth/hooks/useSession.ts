@@ -7,6 +7,8 @@ export type SessionUser = {
   username?: string;
   email: string;
   role: string;
+  // saldo poin dari kolom users.totalPoints, dipakai di checkout
+  totalPoints?: number;
 };
 
 // GET /auth/me -> cookie token ikut terkirim otomatis (withCredentials), BE balikin email & role
