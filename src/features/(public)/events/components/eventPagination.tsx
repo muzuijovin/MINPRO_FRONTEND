@@ -4,6 +4,8 @@ import { EventListMeta } from "@/types/event.type";
 type Props = {
   meta: EventListMeta;
   onPageChange: (page: number) => void;
+  // dipakai ulang di list transaksi -> "transaksi yang cocok"
+  itemLabel?: string;
 };
 
 // pointer, fokus keyboard, dan state disabled yang sama untuk semua tombol pagination
@@ -25,7 +27,7 @@ function getPageItems(current: number, total: number): (number | "...")[] {
   );
 }
 
-export function EventPagination({ meta, onPageChange }: Props) {
+export function EventPagination({ meta, onPageChange, itemLabel = "event" }: Props) {
   const { page, totalPage, limit, totalEvents } = meta;
   const from = (page - 1) * limit + 1;
   const to = Math.min(page * limit, totalEvents);
@@ -39,7 +41,7 @@ export function EventPagination({ meta, onPageChange }: Props) {
             {from} - {to}
           </strong>{" "}
           dari <strong className="font-bold text-ink">{totalEvents}</strong>{" "}
-          event yang cocok
+          {itemLabel} yang cocok
         </p>
 
         {totalPage > 1 && (
