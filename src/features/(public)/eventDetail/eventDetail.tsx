@@ -11,20 +11,23 @@ import { OrganizerCard } from "./components/organizerCard";
 import { ReviewSection } from "./components/reviewSection";
 import { useEventDetail } from "./hooks/useEventDetail";
 
+const FOCUS =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text";
+
 function Breadcrumb({ title }: { title?: string }) {
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-xs leading-4.5 text-[#5a4137]">
-      <Link href="/" className="hover:text-primary">
+    <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-xs leading-4.5 text-ink-muted">
+      <Link href="/" className={`rounded hover:text-accent-text ${FOCUS}`}>
         Beranda
       </Link>
       <FiChevronRight size={12} />
-      <Link href="/events" className="hover:text-primary">
+      <Link href="/events" className={`rounded hover:text-accent-text ${FOCUS}`}>
         Jelajahi Event
       </Link>
       {title && (
         <>
           <FiChevronRight size={12} />
-          <span className="truncate font-semibold text-[#1a1c1c]">{title}</span>
+          <span aria-current="page" className="truncate font-semibold text-ink">{title}</span>
         </>
       )}
     </nav>
@@ -52,7 +55,7 @@ export function EventDetailSection() {
   const { data: event, isLoading, isError } = useEventDetail(slug);
 
   return (
-    <main className="min-h-screen bg-[#f9f9f9]">
+    <main className="min-h-screen bg-page">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 md:px-12">
         <Breadcrumb title={event?.title} />
 
@@ -61,13 +64,13 @@ export function EventDetailSection() {
         ) : isError || !event ? (
           // BE balikin 404 kalau slug tidak ditemukan / event sudah dihapus
           <div className="flex flex-col items-center gap-3 rounded-xl bg-white p-10 text-center shadow-sm">
-            <p className="text-base font-semibold text-[#1a1c1c]">Event tidak ditemukan</p>
-            <p className="text-sm text-[#5a4137]">
+            <p className="text-base font-semibold text-ink">Event tidak ditemukan</p>
+            <p className="text-sm text-ink-muted">
               Event mungkin sudah dihapus atau link nya salah.
             </p>
             <Link
               href="/events"
-              className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:brightness-110"
+              className={`flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-white hover:brightness-110 ${FOCUS}`}
             >
               Jelajahi Event Lain
             </Link>
