@@ -22,7 +22,7 @@ export function EventMetaBar({
     <section className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-12">
       <div className="flex items-center gap-2">
         {/* aria-live: jumlah hasil dibacakan screen reader tiap filter berubah */}
-        <h2 aria-live="polite" className="text-lg font-semibold leading-[26px] tabular-nums text-ink">
+        <h2 aria-live="polite" className="text-lg font-semibold leading-6.5 tabular-nums text-ink">
           {totalEvents === undefined
             ? "Memuat event..."
             : `Menampilkan ${totalEvents} Acara Pilihan`}
