@@ -10,6 +10,7 @@ import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { CategoryTree } from "@/types/category.type";
 import { AccountMenu } from "./components/accountMenu";
+import { NotificationBell } from "./components/notificationBell";
 import { ACCOUNT_LINKS, CREATE_EVENT_HREF, isUserRole } from "./constant/navbarData";
 
 const BRAND_NAME = "SportTicketing";
@@ -221,7 +222,7 @@ export function NavbarLanding() {
                 className="object-cover"
               />
             </span>
-            <span className="text-base font-bold leading-6 tracking-[-0.4px] text-[#1a1c1c]">
+            <span className="text-base font-bold leading-6 tracking-[-0.4px] text-ink">
               Sport<span className="text-primary">Ticketing</span>
             </span>
           </Link>
@@ -273,6 +274,8 @@ export function NavbarLanding() {
                   Buat Event
                 </Link>
               )}
+              {/* lonceng notifikasi untuk yang sudah login (customer & EO), tamu tidak dapat */}
+              {userRole && <NotificationBell role={userRole} />}
               {userRole ? (
                 <AccountMenu username={username} email={email} role={userRole} />
               ) : (

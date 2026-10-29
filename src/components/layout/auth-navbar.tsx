@@ -16,7 +16,7 @@ export default function Navbar() {
               className="object-cover"
             />
           </span>
-          <span className="text-base font-bold leading-6 tracking-[-0.4px] text-[#1a1c1c]">
+          <span className="text-base font-bold leading-6 tracking-[-0.4px] text-ink">
             Sport<span className="text-primary">Ticketing</span>
           </span>
         </Link>
