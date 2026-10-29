@@ -111,11 +111,16 @@ export function HeroSection() {
 
   return (
     <section className="relative mb-32 font-sans">
+      {/* satu h1 per halaman; judul tiap slide pakai h2 */}
+      <h1 className="sr-only">SportTicketing, tiket event olahraga di Indonesia</h1>
+
       {/* ===== Banner Carousel (daisyUI) ===== */}
       <div className="relative overflow-hidden">
         <div
           ref={carouselRef}
           onScroll={handleScroll}
+          aria-roledescription="carousel"
+          aria-label="Event terdekat"
           className="carousel w-full rounded-b-xl"
         >
           {isEventsLoading ? (
@@ -124,9 +129,9 @@ export function HeroSection() {
             // belum ada event terdekat / request gagal -> banner default
             <article className="carousel-item relative h-130 w-full bg-secondary md:h-140">
               <div className="relative z-10 flex h-full flex-col justify-end gap-4 px-6 pb-24 md:px-14 md:pb-28">
-                <h1 className="max-w-2xl text-3xl font-extrabold text-white md:text-5xl">
+                <h2 className="max-w-2xl text-3xl font-extrabold text-balance text-white md:text-5xl">
                   Belum ada event terdekat
-                </h1>
+                </h2>
                 <p className="max-w-xl text-sm text-white/80 md:text-base">
                   Pantau terus, event olahraga baru akan segera hadir.
                 </p>
@@ -145,6 +150,8 @@ export function HeroSection() {
             events.map((event, index) => (
               <article
                 key={event.id}
+                aria-roledescription="slide"
+                aria-label={`${index + 1} dari ${events.length}`}
                 className="carousel-item relative h-130 w-full md:h-140"
               >
                 <Image
@@ -156,12 +163,12 @@ export function HeroSection() {
                   className="object-cover"
                 />
 
-                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/10" />
-                <div className="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-transparent" />
+                <div aria-hidden className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/10" />
+                <div aria-hidden className="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-transparent" />
 
                 <div className="relative z-10 flex h-full flex-col justify-end gap-4 px-6 pb-24 md:px-14 md:pb-28">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="badge border-none bg-primary text-xs font-bold text-white p-1">
+                    <span className="badge border-none bg-accent-text text-xs font-bold text-white p-1">
                       {event.typePrice === "FREE" ? "GRATIS" : "EVENT TERDEKAT"}
                     </span>
                     <span className="badge border-none bg-white/20 text-xs font-semibold text-white backdrop-blur p-1">
@@ -172,9 +179,9 @@ export function HeroSection() {
                     </span>
                   </div>
 
-                  <h1 className="max-w-2xl text-3xl font-extrabold text-white md:text-5xl">
+                  <h2 className="max-w-2xl text-3xl font-extrabold text-balance text-white md:text-5xl">
                     {event.title}
-                  </h1>
+                  </h2>
                   <p className="line-clamp-2 max-w-xl text-sm text-white/80 md:text-base">
                     {event.description}
                   </p>
@@ -204,7 +211,7 @@ export function HeroSection() {
                       ) : (
                         <>
                           Mulai{" "}
-                          <strong className="text-base">
+                          <strong className="text-base tabular-nums">
                             {formatRupiah(Number(event.price))}
                           </strong>
                         </>
@@ -240,36 +247,42 @@ export function HeroSection() {
               type="button"
               aria-label="Slide sebelumnya"
               onClick={() => scrollToSlide(activeIndex - 1)}
-              className="btn btn-circle btn-sm absolute left-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+              className="btn btn-circle absolute left-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              <FiChevronLeft size={18} />
+              <FiChevronLeft aria-hidden size={20} />
             </button>
             <button
               type="button"
               aria-label="Slide berikutnya"
               onClick={() => scrollToSlide(activeIndex + 1)}
-              className="btn btn-circle btn-sm absolute right-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80"
+              className="btn btn-circle absolute right-3 top-1/2 z-20 -translate-y-1/2 border-none bg-black/60 text-white hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              <FiChevronRight size={18} />
+              <FiChevronRight aria-hidden size={20} />
             </button>
 
             {/* Indicator */}
             <div className="absolute bottom-8 right-6 z-10 hidden items-center gap-3 rounded-full border border-white/20 bg-black/50 px-3 py-1.5 text-xs font-semibold text-white lg:flex">
-              <span>
+              <span className="tabular-nums">
                 {String(activeIndex + 1).padStart(2, "0")} /{" "}
                 {String(events.length).padStart(2, "0")}
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center">
                 {events.map((event, i) => (
+                  // area klik 24px, garis indikatornya tetap kecil di dalam
                   <button
                     type="button"
                     key={event.id}
                     aria-label={`Ke slide ${i + 1}`}
+                    aria-current={i === activeIndex ? "true" : undefined}
                     onClick={() => scrollToSlide(i)}
-                    className={`h-1.5 rounded-full transition-all ${
-                      i === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/50"
-                    }`}
-                  />
+                    className="flex h-6 cursor-pointer items-center px-0.5 focus-visible:outline-2 focus-visible:outline-white"
+                  >
+                    <span
+                      className={`block h-1.5 rounded-full motion-safe:transition-all ${
+                        i === activeIndex ? "w-6 bg-primary" : "w-1.5 bg-white/50"
+                      }`}
+                    />
+                  </button>
                 ))}
               </div>
             </div>
@@ -286,12 +299,13 @@ export function HeroSection() {
           >
             <div className="relative flex-1">
               <label className="flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40">
-                <FiSearch className="shrink-0 text-gray-400" />
+                <FiSearch aria-hidden className="shrink-0 text-ink-muted" />
                 <input
                   type="search"
                   autoComplete="off"
+                  aria-label="Cari event olahraga"
                   placeholder="Cari race maraton, liga mini soccer, turnamen esports..."
-                  className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-gray-400"
+                  className="w-full bg-transparent text-sm text-secondary outline-none placeholder:text-ink-muted/80"
                   {...register("keyword", {
                     onChange: () => setIsSuggestOpen(true),
                     onBlur: () => setIsSuggestOpen(false),
@@ -308,16 +322,16 @@ export function HeroSection() {
                   className="absolute left-0 right-0 top-12 z-30 max-h-72 overflow-y-auto rounded-xl border border-gray-100 bg-white p-1 shadow-lg"
                 >
                   {isSuggestFetching && suggestions.length === 0 ? (
-                    <li className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400">
-                      <span className="loading loading-spinner loading-xs" />
+                    <li className="flex items-center gap-2 px-3 py-2 text-xs text-ink-muted">
+                      <span aria-hidden className="loading loading-spinner loading-xs" />
                       Mencari event...
                     </li>
                   ) : isSuggestError ? (
-                    <li className="px-3 py-2 text-xs text-red-500">
-                      Gagal memuat hasil pencarian
+                    <li className="px-3 py-2 text-xs text-danger-text">
+                      Gagal memuat hasil pencarian. Coba ketik ulang kata kuncinya.
                     </li>
                   ) : suggestions.length === 0 ? (
-                    <li className="px-3 py-2 text-xs text-gray-400">
+                    <li className="px-3 py-2 text-xs text-ink-muted">
                       Event &quot;{debouncedKeyword}&quot; tidak ditemukan
                     </li>
                   ) : (
@@ -326,12 +340,12 @@ export function HeroSection() {
                         <li key={event.id}>
                           <Link
                             href={`/events/${event.slug}`}
-                            className="flex flex-col rounded-lg px-3 py-2 hover:bg-neutral"
+                            className="flex min-h-11 flex-col justify-center rounded-lg px-3 py-2 hover:bg-neutral focus-visible:outline-2 focus-visible:outline-accent-text"
                           >
                             <span className="truncate text-sm font-medium text-secondary">
                               {event.title}
                             </span>
-                            <span className="truncate text-[11px] text-gray-400">
+                            <span className="truncate text-xs text-ink-muted">
                               {event.categories?.name} • {event.location}
                             </span>
                           </Link>
@@ -340,7 +354,7 @@ export function HeroSection() {
                       <li>
                         <button
                           type="submit"
-                          className="w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-primary hover:bg-neutral"
+                          className="min-h-11 w-full cursor-pointer rounded-lg px-3 text-left text-xs font-semibold text-accent-text hover:bg-neutral focus-visible:outline-2 focus-visible:outline-accent-text"
                         >
                           Lihat semua hasil &quot;{debouncedKeyword}&quot;
                         </button>
@@ -352,8 +366,9 @@ export function HeroSection() {
             </div>
 
             <label className="relative flex h-11 items-center gap-2 rounded-xl bg-neutral px-4 focus-within:ring-2 focus-within:ring-primary/40 md:w-44">
-              <FiMapPin className="shrink-0 text-gray-400" />
+              <FiMapPin aria-hidden className="shrink-0 text-ink-muted" />
               <select
+                aria-label="Pilih kota"
                 className="w-full appearance-none bg-transparent pr-5 text-sm text-secondary outline-none"
                 {...register("city")}
               >
@@ -363,7 +378,7 @@ export function HeroSection() {
                   </option>
                 ))}
               </select>
-              <FiChevronDown className="pointer-events-none absolute right-3 text-gray-400" />
+              <FiChevronDown aria-hidden className="pointer-events-none absolute right-3 text-ink-muted" />
             </label>
 
             <button
@@ -377,18 +392,18 @@ export function HeroSection() {
 
           {/* Pill populer */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[11px] font-semibold text-gray-500">
+            <span className="text-xs font-semibold text-gray-500">
               Pill Populer:
             </span>
-            {POPULAR_PILLS.map((pill) => (
+            {POPULAR_PILLS.map(({ id, label, icon: Icon }) => (
               <button
-                key={pill.id}
+                key={id}
                 type="button"
-                onClick={() => setValue("keyword", pill.label)}
-                className="flex cursor-pointer items-center gap-1 rounded-full border border-gray-200 bg-neutral px-3 py-1 text-[11px] font-medium text-secondary transition-colors hover:border-primary hover:text-primary"
+                onClick={() => setValue("keyword", label)}
+                className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 bg-neutral px-3 text-xs font-medium text-secondary transition-colors hover:border-accent-text hover:text-accent-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
               >
-                <span>{pill.emoji}</span>
-                {pill.label}
+                <Icon aria-hidden size={14} className="text-accent-text" />
+                {label}
               </button>
             ))}
           </div>
@@ -399,9 +414,9 @@ export function HeroSection() {
           {TRUST_ITEMS.map(({ id, icon: Icon, iconClass, label }) => (
             <li
               key={id}
-              className="flex items-center gap-1.5 text-[11px] font-medium text-secondary"
+              className="flex items-center gap-1.5 text-xs font-medium text-secondary"
             >
-              <Icon className={iconClass} size={14} />
+              <Icon aria-hidden className={iconClass} size={14} />
               {label}
             </li>
           ))}

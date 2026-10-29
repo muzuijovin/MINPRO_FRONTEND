@@ -12,30 +12,30 @@ export function OrganizerCard({ event }: { event: EventDetail }) {
       <div className="flex items-center gap-4">
         {/* belum ada kolom foto EO di BE -> pakai inisial nama organisasi */}
         <div className="relative shrink-0">
-          <span className="flex size-16 items-center justify-center rounded-xl bg-primary text-xl font-bold text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
+          <span aria-hidden className="flex size-16 items-center justify-center rounded-xl bg-accent-text text-xl font-bold text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
             {getInitials(organizer.organizationName)}
           </span>
-          <span className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full bg-[#006c49] p-0.5 text-white shadow">
+          <span className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full bg-success-text p-0.5 text-white shadow">
             <MdVerified size={14} />
           </span>
         </div>
 
         <div className="flex flex-col gap-0.5">
           <div className="flex flex-wrap items-center gap-1">
-            <h3 className="text-lg font-bold leading-6.5 text-[#1a1c1c]">
+            <h2 className="text-lg font-bold leading-6.5 text-ink">
               {organizer.organizationName}
-            </h3>
-            <span className="rounded-full bg-[#6ffbbe] px-2 py-0.5 text-[11px] font-semibold leading-4 tracking-[0.22px] text-[#005236]">
+            </h2>
+            <span className="rounded-full bg-success-soft px-2 py-0.5 text-xs font-semibold leading-4 tracking-[0.22px] text-[#005236]">
               Verified EO
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs leading-4.5">
-            <span className="flex items-center gap-1 font-semibold text-[#1a1c1c]">
+            <span className="flex items-center gap-1 font-semibold text-ink">
               <FaStar className="text-primary" size={13} />
               {event.averageRating.toFixed(1)} / 5.0
             </span>
-            <span className="text-[#5a4137]">•</span>
-            <span className="text-[#5a4137]">{event.totalReviews} Ulasan</span>
+            <span className="text-ink-muted">•</span>
+            <span className="text-ink-muted">{event.totalReviews} Ulasan</span>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@ export function OrganizerCard({ event }: { event: EventDetail }) {
       {/* halaman profil EO belum ada */}
       <Link
         href="#"
-        className="w-fit rounded-full bg-[#eee] px-4 py-2 text-sm font-semibold leading-5 text-[#1a1c1c] transition-colors hover:bg-[#e2e2e2]"
+        className="flex min-h-11 w-fit items-center rounded-full bg-surface-sunken px-4 text-sm font-semibold leading-5 text-ink transition-colors hover:bg-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
       >
         Lihat Profil EO
       </Link>

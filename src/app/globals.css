@@ -20,4 +20,20 @@
 @theme {
   --color-tertiary: #10b981;
   --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  /* token semantik halaman publik (hasil standarisasi ui-ux-pro-max).
+     Semua pasangan teks di bawah lolos kontras WCAG AA 4.5:1 di atas putih / surface */
+  --color-ink: #1a1c1c; /* teks utama */
+  --color-ink-muted: #5a4137; /* teks sekunder / keterangan */
+  --color-accent-text: #a43e00; /* teks & badge oranye (primary #ff6b1a cuma 2.85:1 di putih) */
+  --color-accent-soft: #ffdbcd;
+  --color-page: #f9f9f9; /* latar halaman */
+  --color-surface-muted: #f3f3f3; /* panel / input group */
+  --color-surface-sunken: #eeeeee; /* chip & tombol netral */
+  --color-line: #e2e2e2; /* divider & bintang kosong */
+  --color-success-text: #006c49;
+  --color-success-soft: #6ffbbe;
+  --color-danger-text: #ba1a1a;
+  --color-danger-soft: #ffdad6;
+  --color-info-soft: #d6e0f3;
 }

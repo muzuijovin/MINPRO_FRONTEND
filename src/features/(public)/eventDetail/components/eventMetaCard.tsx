@@ -12,36 +12,36 @@ export function EventMetaCard({ event }: { event: EventDetail }) {
   return (
     <section className="flex flex-col gap-5 rounded-xl bg-white p-6 shadow-[0_1px_1px_rgba(0,0,0,0.05)] sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-4">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#ffdbcd] text-[#a43e00]">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-text">
           <FiCalendar size={22} />
         </span>
         <div>
-          <p className="text-[13px] font-medium leading-4.5 text-[#5a4137]">
+          <p className="text-[13px] font-medium leading-4.5 text-ink-muted">
             Tanggal & Waktu Event
           </p>
-          <h2 className="text-lg font-semibold leading-6.5 text-[#1a1c1c]">
+          <p className="text-lg font-semibold leading-6.5 text-ink">
             {event.startsAt
               ? formatDate(event.startsAt, "EEEE, d MMMM yyyy")
               : "Segera diumumkan"}
-          </h2>
-          <p className="text-xs leading-4.5 text-[#5a4137]">{timeRange}</p>
+          </p>
+          <p className="text-xs leading-4.5 text-ink-muted">{timeRange}</p>
         </div>
       </div>
 
-      <div className="hidden h-10 w-px bg-[#eee] sm:block" />
+      <div aria-hidden className="hidden h-10 w-px bg-surface-sunken sm:block" />
 
       <div className="flex items-start gap-4">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#d6e0f3] text-[#555f6f]">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-info-soft text-[#555f6f]">
           <FiMapPin size={22} />
         </span>
         <div>
-          <p className="text-[13px] font-medium leading-4.5 text-[#5a4137]">
+          <p className="text-[13px] font-medium leading-4.5 text-ink-muted">
             Lokasi Event
           </p>
-          <h2 className="text-lg font-semibold leading-6.5 text-[#1a1c1c]">
+          <p className="text-lg font-semibold leading-6.5 text-ink">
             {event.location}
-          </h2>
-          <p className="text-xs leading-4.5 text-[#5a4137]">
+          </p>
+          <p className="text-xs leading-4.5 text-ink-muted">
             Event {(EVENT_FORMAT_LABEL[event.format] ?? event.format).toLowerCase()}
           </p>
         </div>

@@ -18,32 +18,33 @@ export function EventCard({ event }: { event: EventItem }) {
 
   return (
     <article className="flex flex-col overflow-hidden rounded-xl bg-white shadow-sm">
-      <div className="group relative h-48 w-full bg-[#eee]">
+      <div className="group relative h-48 w-full bg-surface-sunken">
         <Image
           src={event.coverImageUrl}
           alt={event.title}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+          className="object-cover ease-out motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold tracking-[0.22px] text-white">
+        <span className="absolute left-3 top-3 rounded-full bg-accent-text px-2.5 py-0.5 text-xs font-bold tracking-[0.22px] text-white">
           {event.categories?.name}
         </span>
-        <span className="absolute right-3 top-3 rounded-full bg-[#fffbeb] px-2 py-0.5 text-[11px] font-bold tracking-[0.22px] text-[#d97706]">
+        <span className="absolute right-3 top-3 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold tracking-[0.22px] text-amber-800">
           Kuota {event.quota} Slot
         </span>
       </div>
 
       <div className="flex flex-1 flex-col justify-between gap-6 p-4">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 text-xs text-[#5a4137]">
+          <div className="flex items-center gap-1.5 text-xs text-ink-muted">
             <MdVerified className="shrink-0 text-primary" size={15} />
             <span className="truncate">{event.organizer?.organizationName}</span>
           </div>
-          <h3 className="truncate text-lg font-bold leading-[22.5px] text-[#1a1c1c]">
+          {/* judul panjang dipotong, teks lengkap tetap bisa dibaca lewat tooltip */}
+          <h3 title={event.title} className="truncate text-lg font-bold leading-[22.5px] text-ink">
             {event.title}
           </h3>
-          <div className="flex flex-col gap-1 pt-1 text-xs text-[#5a4137]">
+          <div className="flex flex-col gap-1 pt-1 text-xs text-ink-muted">
             {event.startsAt && (
               <span className="flex items-center gap-2">
                 <FiCalendar className="shrink-0" size={13} />
@@ -62,16 +63,17 @@ export function EventCard({ event }: { event: EventItem }) {
 
         <div className="flex items-center justify-between pt-2">
           <div className="flex flex-col">
-            <span className="text-[11px] font-semibold tracking-[0.22px] text-[#5a4137]">
+            <span className="text-xs font-semibold tracking-[0.22px] text-ink-muted">
               {isFree ? "Harga" : "Mulai Dari"}
             </span>
-            <span className="text-lg font-bold leading-6.5 text-primary">
+            <span className="text-lg font-bold leading-6.5 tabular-nums text-accent-text">
               {isFree ? "Gratis" : formatRupiah(Number(event.price))}
             </span>
           </div>
           <Link
             href={`/events/${event.slug}`}
-            className="rounded-lg bg-[#eee] px-4 py-2 text-sm font-semibold text-[#1a1c1c] transition-colors hover:bg-primary hover:text-white"
+            aria-label={`Lihat detail ${event.title}`}
+            className="flex min-h-11 items-center rounded-lg bg-surface-sunken px-4 text-sm font-semibold text-ink transition-colors hover:bg-accent-text hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
           >
             Detail
           </Link>

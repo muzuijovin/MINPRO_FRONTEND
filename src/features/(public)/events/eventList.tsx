@@ -12,7 +12,7 @@ import { EVENTS_PER_PAGE, useEvents } from "./hooks/useEvents";
 export function EvenListSection() {
   const { filters, setFilters, resetFilters, hasActiveFilter } =
     useEventFilters();
-  const { data, isLoading, isError, isPlaceholderData } = useEvents(filters);
+  const { data, isLoading, isError, isPlaceholderData, refetch } = useEvents(filters);
 
   // key untuk reset input search di filter bar waktu "Hapus Filter" diklik
   const [resetKey, setResetKey] = useState(0);
@@ -30,7 +30,7 @@ export function EvenListSection() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f9f9f9] font-sans">
+    <main className="min-h-screen bg-page font-sans">
       <EventFilterBar key={resetKey} filters={filters} setFilters={setFilters} />
 
       <EventMetaBar
@@ -50,22 +50,32 @@ export function EvenListSection() {
             ))}
           </div>
         ) : isError ? (
-          <div className="rounded-xl bg-white p-10 text-center text-sm text-red-500 shadow-sm">
-            Gagal memuat event. Coba muat ulang halaman.
+          // pesan error + jalan keluar (coba lagi), bukan cuma teks merah
+          <div role="alert" className="flex flex-col items-center gap-3 rounded-xl bg-white p-10 text-center shadow-sm">
+            <p className="text-sm font-medium text-danger-text">
+              Gagal memuat event. Periksa koneksi lalu coba lagi.
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="min-h-11 cursor-pointer rounded-lg bg-surface-sunken px-5 text-sm font-semibold text-ink hover:bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
+            >
+              Coba Lagi
+            </button>
           </div>
         ) : events.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-10 text-center shadow-sm">
-            <p className="text-base font-semibold text-[#1a1c1c]">
+            <p className="text-base font-semibold text-ink">
               Event tidak ditemukan
             </p>
-            <p className="text-sm text-[#5a4137]">
+            <p className="text-sm text-ink-muted">
               Coba ubah kata kunci, kota, atau kategori yang dipilih.
             </p>
             {hasActiveFilter && (
               <button
                 type="button"
                 onClick={handleReset}
-                className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:brightness-110"
+                className="mt-2 min-h-11 cursor-pointer rounded-lg bg-primary px-5 text-sm font-semibold text-white hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
               >
                 Hapus Filter
               </button>
