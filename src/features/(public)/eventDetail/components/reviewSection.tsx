@@ -184,7 +184,7 @@ function ReviewItem({ review }: { review: EventReview }) {
           </time>
         </div>
         <Stars value={review.rating} size={14} />
-        <p className="whitespace-pre-line break-words pt-1 text-sm leading-5.5 text-ink-muted">{review.comment}</p>
+        <p className="whitespace-pre-line wrap-break-word pt-1 text-sm leading-5.5 text-ink-muted">{review.comment}</p>
       </div>
     </li>
   );
