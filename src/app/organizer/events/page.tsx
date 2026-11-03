@@ -1,9 +1,19 @@
-import { OrganizerEventsWelcome } from "@/features/organizer/events/components/organizerEventsWelcome";
+import { Suspense } from "react";
+import Footer from "@/components/layout/footer";
+import NavbarSection from "@/components/layout/navbar";
+import { GuardedOrganizerEvents } from "@/features/organizer/events/guardedPages";
 
-export default function OrganizerEventsPage () {
-    return (
-        <>
-        <OrganizerEventsWelcome/>
-        </>
-    )
+// Event Saya: daftar event milik EO + voucher, bisa lihat / edit / hapus
+export default function OrganizerEventsPage() {
+  return (
+    <>
+      <NavbarSection />
+      <main>
+        <Suspense fallback={<div className="min-h-screen bg-page" />}>
+          <GuardedOrganizerEvents />
+        </Suspense>
+      </main>
+      <Footer />
+    </>
+  );
 }
