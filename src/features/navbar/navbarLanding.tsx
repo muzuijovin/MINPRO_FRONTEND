@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { FiChevronDown, FiMenu } from "react-icons/fi";
+import { BrandLogo } from "@/components/layout/brandLogo";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
 import { TYPE_PRICE_OPTIONS } from "@/features/organizer/events/constants/createEventData";
 import { useLogout } from "@/features/auth/hooks/useLogout";
@@ -14,8 +14,6 @@ import { AccountMenu } from "./components/accountMenu";
 import { NotificationBell } from "./components/notificationBell";
 import { ACCOUNT_LINKS, CREATE_EVENT_HREF, isUserRole } from "./constant/navbarData";
 import { useNavbarDropdowns } from "./hooks/useNavbarDropdowns";
-
-const BRAND_NAME = "SportTicketing";
 
 type NavLink = { label: string; href: string };
 
@@ -217,20 +215,7 @@ export function NavbarLanding() {
             </ul>
           </details>
 
-          <Link href="/" className="flex items-center gap-2">
-            <span className="relative block h-9 w-9 overflow-hidden rounded-lg bg-primary">
-              <Image
-                src="/jovlen-logo.jpg"
-                alt={`Logo ${BRAND_NAME}`}
-                fill
-                sizes="36px"
-                className="object-cover"
-              />
-            </span>
-            <span className="text-base font-bold leading-6 tracking-[-0.4px] text-ink">
-              Sport<span className="text-primary">Ticketing</span>
-            </span>
-          </Link>
+          <BrandLogo />
         </div>
 
         {/* Tengah: menu desktop */}

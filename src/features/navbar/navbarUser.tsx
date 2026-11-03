@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { MdOutlineConfirmationNumber } from "react-icons/md";
 
-const BRAND_NAME = "SportTicketing";
+const BRAND_NAME = "JOVLEN";
 
 type NavLink = { label: string; href: string };
 

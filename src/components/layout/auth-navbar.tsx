@@ -1,25 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "./brandLogo";
 
 export default function Navbar() {
   return (
     <header className="w-full h-fit border-b border-[#E5E7EB]/80 bg-white">
       <nav className="mx-auto flex h-20 w-full items-center justify-between px-6 md:px-7">
-        {/* Logo SportTicketing, sama dengan navbar landing */}
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="relative block h-9 w-9 overflow-hidden rounded-lg bg-primary">
-            <Image
-              src="/jovlen-logo.jpg"
-              alt="Logo SportTicketing"
-              fill
-              sizes="36px"
-              className="object-cover"
-            />
-          </span>
-          <span className="text-base font-bold leading-6 tracking-[-0.4px] text-ink">
-            Sport<span className="text-primary">Ticketing</span>
-          </span>
-        </Link>
+        <BrandLogo />
 
         {/* Navigation - Right Side */}
         <div className="flex items-center gap-4 md:gap-5">
