@@ -1,5 +1,5 @@
 import AuthNavbar from "../../components/layout/auth-navbar";
-import Footer from "../../components/layout/footer";
+import Footer from "../../components/layout/auth-footer";
 
 export default function AuthLayout({
   children,

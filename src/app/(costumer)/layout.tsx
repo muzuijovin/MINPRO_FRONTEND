@@ -1,6 +1,5 @@
-
 import NavbarSection from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import Footer from "@/components/layout/auth-footer";
 
 export default function CustomerLayout({
   children,
