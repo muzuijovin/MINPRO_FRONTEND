@@ -8,6 +8,10 @@ import ToastProvider from "../providers/toastProvider";
 export const metadata: Metadata = {
   title: "JOVLEN",
   description: "Platform Ticketing Event",
+  // favicon logo JL ada di public/favicon.ico
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
