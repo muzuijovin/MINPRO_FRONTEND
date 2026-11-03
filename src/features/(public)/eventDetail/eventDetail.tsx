@@ -9,7 +9,7 @@ import { EventDescription } from "./components/eventDescription";
 import { EventMetaCard } from "./components/eventMetaCard";
 import { OrganizerCard } from "./components/organizerCard";
 import { ReviewSection } from "./components/reviewSection";
-import { useEventDetail } from "./hooks/useEventDetail";
+import { isNotFoundError, useEventDetail } from "./hooks/useEventDetail";
 
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text";
@@ -52,16 +52,32 @@ function EventDetailSkeleton() {
 
 export function EventDetailSection() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: event, isLoading, isError } = useEventDetail(slug);
+  const { data: event, isPending, isError, error, isRefetching, refetch } = useEventDetail(slug);
+  // isPending (bukan isLoading): selama slug belum kebaca query masih disabled, tetap tampil skeleton
+  const isNotFound = isNotFoundError(error) || (!isPending && !isError && !event);
 
   return (
     <main className="min-h-screen bg-page">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 md:px-12">
         <Breadcrumb title={event?.title} />
 
-        {isLoading ? (
+        {isPending ? (
           <EventDetailSkeleton />
-        ) : isError || !event ? (
+        ) : isError && !isNotFound ? (
+          // error server / koneksi (sudah dicoba ulang otomatis) -> beri tombol coba lagi, bukan "tidak ditemukan"
+          <div role="alert" className="flex flex-col items-center gap-3 rounded-xl bg-white p-10 text-center shadow-sm">
+            <p className="text-base font-semibold text-ink">Gagal memuat event</p>
+            <p className="text-sm text-ink-muted">Server sedang sibuk atau koneksi terputus. Coba lagi sebentar.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isRefetching}
+              className={`flex min-h-11 cursor-pointer items-center rounded-full bg-primary px-5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 ${FOCUS}`}
+            >
+              {isRefetching ? "Memuat..." : "Coba Lagi"}
+            </button>
+          </div>
+        ) : isNotFound || !event ? (
           // BE balikin 404 kalau slug tidak ditemukan / event sudah dihapus
           <div className="flex flex-col items-center gap-3 rounded-xl bg-white p-10 text-center shadow-sm">
             <p className="text-base font-semibold text-ink">Event tidak ditemukan</p>
