@@ -1,106 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SportTicketing — Frontend
 
-## Getting Started
+Platform tiket event olahraga (lari, sepak bola, esports). Customer bisa mencari event, membeli tiket, mengunggah bukti transfer, dan memberi ulasan. Event Organizer (EO) bisa membuat event, mengatur voucher, dan memverifikasi pembayaran.
 
-First, run the development server:
+Repo ini berisi frontend (Next.js). Backend ada di repo terpisah: **MINPRO_BACKEND** (Express + Prisma).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+
+| Kebutuhan | Library |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript |
+| Styling | Tailwind CSS v4 + daisyUI 5 |
+| Data fetching | TanStack Query v5 + Axios |
+| State global | Zustand (session user) |
+| Form & validasi | React Hook Form + Zod |
+| Lainnya | date-fns, react-icons, react-toastify, use-debounce |
+
+## Menjalankan Project
+
+**Prasyarat:** Node.js 20+ dan backend MINPRO_BACKEND sudah berjalan (default di port `8000`).
+
+1. Install dependency
+
+   ```bash
+   npm install
+   ```
+
+2. Buat file `.env` di root project
+
+   ```env
+   NEXT_PUBLIC_API_BASE_URL="http://localhost:8000/api/v1"
+   ```
+
+3. Jalankan development server
+
+   ```bash
+   npm run dev
+   ```
+
+   Buka [http://localhost:3000](http://localhost:3000).
+
+### Script
+
+| Perintah | Fungsi |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Build production |
+| `npm run start` | Menjalankan hasil build |
+| `npm run lint` | Cek ESLint |
+
+## Fitur
+
+### Publik (tanpa login)
+
+- **Landing page**: hero carousel, kategori olahraga, event pilihan (kuota terbanyak per kategori), event mendatang, dan keunggulan platform.
+- **Jelajahi event**: pencarian dengan debounce, filter kategori & subkategori, kota, tipe harga, urutan, dan pagination. Semua filter tersimpan di URL sehingga bisa dibagikan.
+- **Detail event**: info event, voucher aktif, profil penyelenggara, serta rating & ulasan peserta.
+
+### Customer
+
+- **Checkout**: pilih jumlah tiket, rekening tujuan, voucher event, dan potong harga pakai poin. Satu customer hanya bisa punya satu transaksi aktif per event.
+- **Pembayaran**: countdown batas bayar dan upload bukti transfer.
+- **Riwayat transaksi** dan **Tiket Saya** (e-ticket dari transaksi yang sudah lunas).
+- **Ulasan**: hanya untuk peserta dengan transaksi lunas setelah event selesai.
+- **Notifikasi** di navbar (pembayaran diterima, ditolak, kedaluwarsa).
+
+### Event Organizer
+
+- **Event Saya**: daftar event milik EO beserta vouchernya. Bisa lihat, edit (selama event belum selesai), dan hapus.
+- **Buat event** dan **buat voucher**.
+- **Kelola transaksi**: terima atau tolak bukti transfer customer.
+- **Notifikasi** saat ada bukti transfer baru.
+
+## Struktur Folder
+
+```
+src/
+├── app/                      # Routing (App Router), page.tsx dibuat setipis mungkin
+│   ├── (public)/             # /, /events, /events/[slug]
+│   ├── (auth)/               # /login, /register, /forgot-password, /reset-password
+│   ├── (costumer)/           # /checkout, /transaction, /transaction/[id], /my-ticket, /profile
+│   └── organizer/            # /organizer/dashboard, /events, /transactions, /voucher
+├── features/                 # Komponen, hooks, dan konstanta per fitur
+│   ├── (public)/             # landing, events, eventDetail
+│   ├── (auth)/ · auth/       # login, registrasi, session
+│   ├── transaction/          # checkout, pembayaran, riwayat, tiket, kelola transaksi EO
+│   ├── organizer/            # event saya, buat/edit event, voucher
+│   ├── navbar/ · notification/ · categories/
+│   └── validation/           # schema Zod untuk form
+├── components/layout/        # Navbar & footer
+├── hoc/withAuthGuard.tsx     # Proteksi halaman berdasarkan role
+├── store/useAuthStore.ts     # Session user (Zustand)
+├── providers/                # React Query, sinkronisasi session, toast
+├── lib/                      # Axios instance & helper tanggal
+└── types/                    # Tipe data response API
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Konvensi
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-src/
-├── app/
-│   ├── page.tsx                          # Landing Page (Daftar event mendatang + Debounce search)
-│   ├── layout.tsx
-│   ├── globals.css
-│   │
-│   ├── events/
-│   │   ├── page.tsx                      # Penjelajahan Event (Filter kategori/lokasi)
-│   │   └── [eventId]/
-│   │       └── page.tsx                  # Detail Event + Tombol Beli Tiket
-│   │
-│   ├── checkout/
-│   │   └── [eventId]/
-│   │       └── page.tsx                  # Halaman Form Checkout (Gunakan poin/voucher)
-│   │
-│   ├── transactions/
-│   │   ├── page.tsx                      # Riwayat Transaksi Customer (Status transaksi)
-│   │   └── [transactionId]/
-│   │       └── page.tsx                  # Detail Transaksi + Countdown 10 Menit & Upload Bukti
-│   │
-│   ├── organizer/                        # Area khusus Event Organizer (Protected Route)
-│   │   ├── dashboard/
-│   │   │   └── page.tsx                  # Dashboard EO (Kelola transaksi masuk: Terima/Tolak bukti)
-│   │   ├── events/
-│   │   │   ├── page.tsx                  # Daftar event yang dibuat oleh EO tersebut
-│   │   │   ├── create/
-│   │   │   │   └── page.tsx              # Form Pembuatan Event (Nama, harga, kuota, tgl mulai/selesai)
-│   │   │   └── [eventId]/
-│   │   │       └── edit/
-│   │   │           └── page.tsx          # Form Edit Event
-│   │   ├── vouchers/
-│   │   │   └── page.tsx                  # Pembuatan & Manajemen Voucher Promosi Event (Periode terbatas)
-│   │   └── profile/
-│   │       └── page.tsx                  # Profil EO (Menampilkan akumulasi rating & ulasan)
-│   │
-│   ├── profile/
-│   │   └── page.tsx                      # Profil Customer
-│   ├── login/
-│   │   └── page.tsx
-│   └── register/
-│       └── page.tsx
-│
-├── features/                             # Logika bisnis, hooks, state, komponen spesifik fitur
-│   ├── landing/                          # Logika landing page
-│   ├── events/                           # Filter event, detail event, form create/edit event
-│   ├── transactions/                     # [TAMBAHAN] Logic checkout, hitung mundur 10 menit, upload bukti
-│   ├── reviews/                          # [TAMBAHAN] Logic input ulasan & rating dari customer
-│   ├── dashboard/                        # [TAMBAHAN] Logic EO approve/reject transaksi pembeli
-│   ├── vouchers/                         # Logic pembuatan voucher terbatas oleh EO
-│   ├── profile/
-│   └── auth/
-│
-├── components/                           # Komponen global (Re-usable)
-│   ├── layout/                           # Navbar, Footer, Sidebar Organizer
-│   └── ui/                               # Button, Input, Modal, Badge Status, Countdown Timer
-│
-├── hooks/                                # [RECOMMENDED] Custom hooks global
-│   ├── useDebounce.ts                    # Hook khusus untuk fungsionalitas debounce search bar
-│   └── useCountdown.ts                   # Hook khusus untuk hitung mundur 10 menit transaksi
-│
-├── lib/
-│   ├── axios.ts
-│   └── utils.ts                          # Helper rupiah formatter (IDR) & format tanggal
-│
-└── types/
-    ├── event.types.ts                    # Type khusus data event & voucher
-    ├── transaction.types.ts              # Type khusus transaksi & status enum
-    └── common.types.ts
+- **Halaman yang butuh login** dibungkus `withAuthGuard(Component, ["CUSTOMER"] | ["EO"])` di file `"use client"`, lalu dirender dari `page.tsx` di dalam `<Suspense>`.
+- **Warna** memakai token semantik di `globals.css` (`text-ink`, `text-ink-muted`, `bg-page`, `bg-surface-muted`, `text-accent-text`, dst), bukan hex langsung.
+- **Aksesibilitas**: elemen interaktif punya focus ring, `aria-label` untuk tombol ikon, dan target sentuh minimal 40–44px.
+- **Branch**: `feat/<nama-fitur>` untuk fitur baru, `fix/<nama>` untuk perbaikan, lalu merge ke `main` lewat Pull Request.
+- **Commit**: format [Conventional Commits](https://www.conventionalcommits.org/) dalam Bahasa Indonesia, contoh `feat: halaman tiket saya untuk customer`.
