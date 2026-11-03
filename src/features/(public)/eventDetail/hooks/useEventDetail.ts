@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { axiosInstance } from "@/lib/axios-instance.lib";
 import { ApiResponse } from "@/types/api-response.type";
 import { EventDetail } from "@/types/event.type";
@@ -15,6 +16,11 @@ export function useEventDetail(slug: string) {
     },
     // slug kosong (belum kebaca dari URL) -> jangan request dulu
     enabled: !!slug,
-    retry: false,
+    // 404 = slug memang tidak ada, tidak perlu dicoba ulang.
+    // error lain (server baru bangun / koneksi putus) dicoba ulang maksimal 2x
+    retry: (failureCount, error) => !isNotFoundError(error) && failureCount < 2,
   });
 }
+
+export const isNotFoundError = (error: unknown) =>
+  error instanceof AxiosError && error.response?.status === 404;
