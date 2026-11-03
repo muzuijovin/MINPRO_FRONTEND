@@ -36,4 +36,16 @@
   --color-danger-text: #ba1a1a;
   --color-danger-soft: #ffdad6;
   --color-info-soft: #d6e0f3;
+
+  /* bar pengumuman di atas navbar: konten digandakan 2x, geser -50% supaya loop nya mulus */
+  --animate-marquee: marquee 45s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }

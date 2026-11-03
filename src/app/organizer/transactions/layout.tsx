@@ -1,5 +1,5 @@
 import NavbarSection from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import Footer from "@/components/layout/auth-footer";
 
 // halaman organizer lain belum punya layout, jadi navbar + footer cukup dipasang di route transaksi
 export default function OrganizerTransactionsLayout({
