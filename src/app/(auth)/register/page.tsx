@@ -1,8 +1,10 @@
 'use client';
 
+import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { toast } from 'react-toastify';
+import { axiosInstance } from '@/lib/axios-instance.lib';
 
 type AccountType = 'CUSTOMER' | 'EO';
 
@@ -61,9 +63,15 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+    // aturan sama dengan validator BE (registerUserSchema)
+    if (
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/\d/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
       setError(
-        'Password must include at least one number and one special character.',
+        'Password must include an uppercase letter, a lowercase letter, a number, and a special character.',
       );
       return;
     }
@@ -81,51 +89,26 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      const apiBaseUrl = (
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      ).replace(/\/$/, '');
       const payload: {
         username: string;
         email: string;
         password: string;
-        role: AccountType;
         referralCode?: string;
       } = {
         username: cleanUsername,
         email: cleanEmail,
         password,
-        role: accountType,
       };
 
       if (cleanReferralCode) {
         payload.referralCode = cleanReferralCode;
       }
 
-      const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const result = (await response.json().catch(() => ({}))) as ApiResponse;
-
-      if (!response.ok) {
-        const validationMessage = result.errors
-          ?.map((item) => item.message)
-          .filter(Boolean)
-          .join(' ');
-
-        const message =
-          result.message ||
-          validationMessage ||
-          'Registration failed. Please try again.';
-        setError(
-          validationMessage && result.message === 'Validation failed'
-            ? validationMessage
-            : message,
-        );
-        return;
-      }
+      // BE punya endpoint terpisah per role; axiosInstance otomatis pakai base URL /api/v1 (proxy ke backend)
+      await axiosInstance.post(
+        accountType === 'EO' ? '/auth/register/eo' : '/auth/register/customer',
+        payload,
+      );
 
       setSuccess(
         'Registration successful! Your Jovlen account has been created. You can now sign in.',
@@ -140,10 +123,24 @@ export default function RegisterPage() {
       setShowPassword(false);
       setShowConfirmPassword(false);
       setAccountType('CUSTOMER');
-    } catch {
-      setError(
-        'Could not connect to the server. Please make sure the backend is running and try again.',
-      );
+    } catch (err) {
+      // BE merespons tapi menolak (validasi / email sudah dipakai) -> tampilkan pesan dari BE
+      if (err instanceof AxiosError && err.response) {
+        const result = (err.response.data ?? {}) as ApiResponse;
+        const validationMessage = result.errors
+          ?.map((item) => item.message)
+          .filter(Boolean)
+          .join(' ');
+        setError(
+          validationMessage ||
+            result.message ||
+            'Registration failed. Please try again.',
+        );
+      } else {
+        setError(
+          'Could not connect to the server. Please check your connection and try again.',
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -282,8 +279,8 @@ export default function RegisterPage() {
                 </button>
               </div>
               <p className="mt-2 text-[11px] leading-4 text-[#94A3B8]">
-                Must be at least 8 characters with 1 number and 1 special
-                character.
+                Must be at least 8 characters with 1 uppercase letter, 1
+                lowercase letter, 1 number, and 1 special character.
               </p>
             </div>
 

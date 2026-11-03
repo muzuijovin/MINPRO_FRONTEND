@@ -3,6 +3,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AxiosError } from "axios";
+import { axiosInstance } from "@/lib/axios-instance.lib";
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
@@ -15,6 +17,8 @@ export default function ResetPasswordPage() {
   const hasMinLength = newPassword.length >= 8;
   const hasNumber = /\d/.test(newPassword);
   const hasSpecialCharacter = /[^A-Za-z0-9]/.test(newPassword);
+  // aturan sama dengan validator BE (resetPasswordUserSchema)
+  const hasUpperAndLower = /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -22,9 +26,9 @@ export default function ResetPasswordPage() {
     event.preventDefault();
     setError("");
 
-    if (!hasMinLength || !hasNumber || !hasSpecialCharacter) {
+    if (!hasMinLength || !hasNumber || !hasSpecialCharacter || !hasUpperAndLower) {
       setError(
-        "Password must be at least 8 characters and include a number and a special character."
+        "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character."
       );
       return;
     }
@@ -48,35 +52,18 @@ export default function ResetPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      // Ganti URL ini sesuai endpoint backend yang sebenarnya.
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token,
-            newPassword,
-            confirmPassword,
-          }),
-        }
-      );
-
-      const result = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(
-          result?.message || "Unable to reset password. Please try again."
-        );
-      }
+      // axiosInstance otomatis pakai base URL /api/v1 (proxy ke backend)
+      await axiosInstance.post("/auth/reset-password", {
+        token,
+        newPassword,
+        confirmPassword,
+      });
 
       window.location.href = "/login?reset=success";
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
+        err instanceof AxiosError
+          ? (err.response?.data?.message ?? "Could not connect to the server. Please try again.")
           : "Something went wrong. Please try again."
       );
     } finally {
