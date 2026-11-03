@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRef } from "react";
 import { FiChevronDown, FiMenu } from "react-icons/fi";
 import { useCategoryTree } from "@/features/categories/hooks/useCategoryTree";
 import { TYPE_PRICE_OPTIONS } from "@/features/organizer/events/constants/createEventData";
@@ -12,6 +13,7 @@ import { CategoryTree } from "@/types/category.type";
 import { AccountMenu } from "./components/accountMenu";
 import { NotificationBell } from "./components/notificationBell";
 import { ACCOUNT_LINKS, CREATE_EVENT_HREF, isUserRole } from "./constant/navbarData";
+import { useNavbarDropdowns } from "./hooks/useNavbarDropdowns";
 
 const BRAND_NAME = "SportTicketing";
 
@@ -97,6 +99,9 @@ function CategoryMenuItems({
 
 export function NavbarLanding() {
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+  // dropdown navbar tidak boleh numpuk, dan tertutup kalau klik di luar / Esc
+  useNavbarDropdowns(headerRef);
   // diisi AuthSync dari GET /auth/me; role kosong = belum login
   const { username, email, role, isChecked } = useAuthStore();
   const userRole = isUserRole(role) ? role : null;
@@ -121,7 +126,7 @@ export function NavbarLanding() {
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
+    <header ref={headerRef} className="sticky top-0 z-50 border-b border-gray-100 bg-white">
       <nav className="navbar mx-auto max-w-7xl gap-2 px-4 md:px-6">
         {/* Kiri: hamburger (mobile) + logo */}
         <div className="navbar-start gap-2">
