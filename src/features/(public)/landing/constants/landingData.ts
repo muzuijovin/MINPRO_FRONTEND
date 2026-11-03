@@ -1,6 +1,6 @@
 import { IconType } from "react-icons";
 import { FiCreditCard, FiShield } from "react-icons/fi";
-import { MdDirectionsRun, MdOutlineQrCode2, MdSportsEsports, MdSportsSoccer } from "react-icons/md";
+import { MdDirectionsRun, MdOutlineConfirmationNumber, MdSportsEsports, MdSportsSoccer } from "react-icons/md";
 
 // ikon & deskripsi kartu kategori, key = slug parent dari GET /categories/tree
 export const CATEGORY_INFO: Record<string, { icon: IconType; description: string }> = {
@@ -23,9 +23,9 @@ export const UPCOMING_LIMIT = 4;
 
 export const BENEFITS: { icon: IconType; title: string; description: string }[] = [
   {
-    icon: MdOutlineQrCode2,
-    title: "Check-In BIB & QR 3 Detik",
-    description: "E-ticket langsung terbit setelah pembayaran diverifikasi, tinggal tunjukkan di lokasi.",
+    icon: MdOutlineConfirmationNumber,
+    title: "E-Ticket Langsung Terbit",
+    description: "Tiket digital terbit otomatis setelah pembayaran dikonfirmasi penyelenggara, cek kapan saja di riwayat transaksi.",
   },
   {
     icon: FiCreditCard,
