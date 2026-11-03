@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="w-full border-t border-[#E5E7EB] bg-white">
-      <div className="mx-auto flex min-h-[64px] w-full items-center justify-between gap-4 px-6 py-4 md:px-7">
+      <div className="mx-auto flex min-h-16 w-full items-center justify-between gap-4 px-6 py-4 md:px-7">
         {/* Copyright — Left */}
         <p className="text-[11px] leading-5 text-[#6B7280]">
           © 2025 Jovlen Experiences Inc. All rights reserved.
